@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, User, Calendar, Moon, Sun, Search } from 'lucide-react';
+import { Menu, X, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/ThemeToggle';
+import UserDropdown from '@/components/UserDropdown';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Header: React.FC = () => {
@@ -47,17 +48,7 @@ const Header: React.FC = () => {
             </Button>
             <ThemeToggle />
             {user ? (
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-muted-foreground">Welcome, {user.email}</span>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleSignOut}
-                  className="border-blush-200 text-blush-500 hover:bg-blush-50 dark:border-blush-800 dark:text-blush-400 dark:hover:bg-blush-900/20"
-                >
-                  Sign Out
-                </Button>
-              </div>
+              <UserDropdown onSignOut={handleSignOut} />
             ) : (
               <>
                 <Link to="/login">
@@ -125,12 +116,21 @@ const Header: React.FC = () => {
               {user ? (
                 <>
                   <span className="px-4 py-2 text-sm text-muted-foreground">Welcome, {user.email}</span>
+                  <Link to="/settings" className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors" onClick={() => setIsOpen(false)}>
+                    My Settings
+                  </Link>
+                  <Link to="/my-bookings" className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors" onClick={() => setIsOpen(false)}>
+                    My Bookings
+                  </Link>
+                  <Link to="/dashboard" className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors" onClick={() => setIsOpen(false)}>
+                    My Dashboard
+                  </Link>
                   <Button 
                     variant="outline" 
                     className="w-full border-blush-200 text-blush-500 dark:border-blush-800 dark:text-blush-400"
                     onClick={handleSignOut}
                   >
-                    Sign Out
+                    Log out
                   </Button>
                 </>
               ) : (
