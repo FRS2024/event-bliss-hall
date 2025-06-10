@@ -4,9 +4,16 @@ import { Link } from 'react-router-dom';
 import { Menu, X, User, Calendar, Moon, Sun, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/ThemeToggle';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  
+  const handleSignOut = async () => {
+    await signOut();
+    setIsOpen(false);
+  };
   
   return (
     <header className="bg-white dark:bg-card border-b border-champagne-100 dark:border-champagne-900/40 sticky top-0 z-50">
@@ -39,16 +46,32 @@ const Header: React.FC = () => {
               <Search size={20} />
             </Button>
             <ThemeToggle />
-            <Link to="/login">
-              <Button variant="outline" size="sm" className="border-blush-200 text-blush-500 hover:bg-blush-50 dark:border-blush-800 dark:text-blush-400 dark:hover:bg-blush-900/20">
-                Login
-              </Button>
-            </Link>
-            <Link to="/signup">
-              <Button size="sm" className="bg-blush-400 hover:bg-blush-500 text-white">
-                Sign Up
-              </Button>
-            </Link>
+            {user ? (
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-muted-foreground">Welcome, {user.email}</span>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleSignOut}
+                  className="border-blush-200 text-blush-500 hover:bg-blush-50 dark:border-blush-800 dark:text-blush-400 dark:hover:bg-blush-900/20"
+                >
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="outline" size="sm" className="border-blush-200 text-blush-500 hover:bg-blush-50 dark:border-blush-800 dark:text-blush-400 dark:hover:bg-blush-900/20">
+                    Login
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button size="sm" className="bg-blush-400 hover:bg-blush-500 text-white">
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
           
           {/* Mobile Menu Button */}
@@ -99,16 +122,31 @@ const Header: React.FC = () => {
               Contact
             </Link>
             <div className="pt-4 border-t border-champagne-100 dark:border-champagne-900/40 flex flex-col space-y-2">
-              <Link to="/login" onClick={() => setIsOpen(false)}>
-                <Button variant="outline" className="w-full border-blush-200 text-blush-500 dark:border-blush-800 dark:text-blush-400">
-                  Login
-                </Button>
-              </Link>
-              <Link to="/signup" onClick={() => setIsOpen(false)}>
-                <Button className="w-full bg-blush-400 hover:bg-blush-500 text-white">
-                  Sign Up
-                </Button>
-              </Link>
+              {user ? (
+                <>
+                  <span className="px-4 py-2 text-sm text-muted-foreground">Welcome, {user.email}</span>
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-blush-200 text-blush-500 dark:border-blush-800 dark:text-blush-400"
+                    onClick={handleSignOut}
+                  >
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" onClick={() => setIsOpen(false)}>
+                    <Button variant="outline" className="w-full border-blush-200 text-blush-500 dark:border-blush-800 dark:text-blush-400">
+                      Login
+                    </Button>
+                  </Link>
+                  <Link to="/signup" onClick={() => setIsOpen(false)}>
+                    <Button className="w-full bg-blush-400 hover:bg-blush-500 text-white">
+                      Sign Up
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
         </div>

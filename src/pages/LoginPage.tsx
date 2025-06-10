@@ -1,10 +1,50 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import MainLayout from '@/components/layout/MainLayout';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 const LoginPage: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { signIn, user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const { error } = await signIn(email, password);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Logged in successfully!",
+      });
+      navigate('/');
+    }
+
+    setLoading(false);
+  };
+
   return (
     <MainLayout>
       <div className="min-h-[calc(100vh-200px)] flex items-center justify-center py-12">
@@ -14,24 +54,30 @@ const LoginPage: React.FC = () => {
             <p className="text-muted-foreground">Sign in to your EasyHall account</p>
           </div>
 
-          <form className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
-              <input 
+              <Label htmlFor="email" className="block text-sm font-medium mb-1">Email</Label>
+              <Input 
                 id="email" 
                 type="email" 
                 placeholder="Your email address"
-                className="elegant-input" 
+                className="elegant-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
             
             <div>
-              <label htmlFor="password" className="block text-sm font-medium mb-1">Password</label>
-              <input 
+              <Label htmlFor="password" className="block text-sm font-medium mb-1">Password</Label>
+              <Input 
                 id="password" 
                 type="password" 
                 placeholder="Your password"
-                className="elegant-input" 
+                className="elegant-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
             
@@ -52,8 +98,12 @@ const LoginPage: React.FC = () => {
               </a>
             </div>
             
-            <Button className="w-full bg-blush-400 hover:bg-blush-500 text-white">
-              Sign In
+            <Button 
+              type="submit" 
+              className="w-full bg-blush-400 hover:bg-blush-500 text-white"
+              disabled={loading}
+            >
+              {loading ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
           
