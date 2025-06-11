@@ -82,7 +82,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ onSignOut }) => {
           <DropdownMenuItem asChild>
             <Link to="/dashboard" className="flex items-center">
               <LayoutDashboard className="mr-2 h-4 w-4" />
-              <span>My Dashboard</span>
+              <span>Host Dashboard</span>
             </Link>
           </DropdownMenuItem>
         )}

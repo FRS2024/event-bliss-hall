@@ -7,30 +7,67 @@ import { Calendar, MapPin, DollarSign, Users } from 'lucide-react';
 import VenuesList from './VenuesList';
 
 const DashboardOverview: React.FC = () => {
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading, error } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
-      const { data: venues } = await supabase
-        .from('venues')
-        .select('*')
-        .eq('host_id', (await supabase.auth.getUser()).data.user?.id);
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) throw new Error('Not authenticated');
 
-      const { data: bookings } = await supabase
-        .from('bookings')
-        .select('*')
-        .eq('host_id', (await supabase.auth.getUser()).data.user?.id);
+      console.log('Fetching dashboard stats for user:', user.user.id);
 
-      const totalRevenue = bookings?.reduce((sum, booking) => 
-        sum + Number(booking.total_price), 0) || 0;
+      const [venuesResult, bookingsResult] = await Promise.all([
+        supabase
+          .from('venues')
+          .select('*')
+          .eq('host_id', user.user.id),
+        supabase
+          .from('bookings')
+          .select('*')
+          .eq('host_id', user.user.id)
+      ]);
+
+      if (venuesResult.error) {
+        console.error('Error fetching venues:', venuesResult.error);
+        throw venuesResult.error;
+      }
+
+      if (bookingsResult.error) {
+        console.error('Error fetching bookings:', bookingsResult.error);
+        throw bookingsResult.error;
+      }
+
+      const venues = venuesResult.data || [];
+      const bookings = bookingsResult.data || [];
+
+      const totalRevenue = bookings.reduce((sum, booking) => 
+        sum + Number(booking.total_price || 0), 0);
 
       return {
-        totalVenues: venues?.length || 0,
-        totalBookings: bookings?.length || 0,
+        totalVenues: venues.length,
+        totalBookings: bookings.length,
         totalRevenue,
-        pendingBookings: bookings?.filter(b => b.status === 'pending').length || 0,
+        pendingBookings: bookings.filter(b => b.status === 'pending').length,
       };
     },
   });
+
+  if (error) {
+    console.error('Dashboard error:', error);
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard Overview</h1>
+          <p className="text-gray-600 dark:text-gray-400">Manage your venues and track your performance</p>
+        </div>
+        <Card>
+          <CardContent className="text-center py-8">
+            <h3 className="text-lg font-semibold mb-2 text-red-600">Error loading dashboard</h3>
+            <p className="text-gray-600">Please try refreshing the page or contact support if the issue persists.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -46,7 +83,9 @@ const DashboardOverview: React.FC = () => {
             <MapPin className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalVenues || 0}</div>
+            <div className="text-2xl font-bold">
+              {isLoading ? '...' : (stats?.totalVenues || 0)}
+            </div>
           </CardContent>
         </Card>
 
@@ -56,7 +95,9 @@ const DashboardOverview: React.FC = () => {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalBookings || 0}</div>
+            <div className="text-2xl font-bold">
+              {isLoading ? '...' : (stats?.totalBookings || 0)}
+            </div>
           </CardContent>
         </Card>
 
@@ -66,7 +107,9 @@ const DashboardOverview: React.FC = () => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${stats?.totalRevenue.toFixed(2) || '0.00'}</div>
+            <div className="text-2xl font-bold">
+              {isLoading ? '...' : `${(stats?.totalRevenue || 0).toFixed(2)} DA`}
+            </div>
           </CardContent>
         </Card>
 
@@ -76,7 +119,9 @@ const DashboardOverview: React.FC = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.pendingBookings || 0}</div>
+            <div className="text-2xl font-bold">
+              {isLoading ? '...' : (stats?.pendingBookings || 0)}
+            </div>
           </CardContent>
         </Card>
       </div>

@@ -11,7 +11,13 @@ const DashboardPage: React.FC = () => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <MainLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-lg">Loading...</div>
+        </div>
+      </MainLayout>
+    );
   }
 
   if (!user) {
@@ -21,7 +27,7 @@ const DashboardPage: React.FC = () => {
   return (
     <MainLayout>
       <SidebarProvider>
-        <div className="flex min-h-screen">
+        <div className="flex min-h-screen w-full">
           <DashboardSidebar />
           <div className="flex-1">
             <DashboardContent />
