@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { Upload, X } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const ALGERIA_CITIES = [
   'Algiers', 'Oran', 'Constantine', 'Batna', 'Djelfa', 'Setif', 'Annaba', 'Sidi Bel Abbes',
@@ -45,6 +46,7 @@ const AddVenueForm: React.FC = () => {
   const [images, setImages] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<VenueFormData>();
 
@@ -54,6 +56,14 @@ const AddVenueForm: React.FC = () => {
   React.useEffect(() => {
     register('city', { required: 'City is required' });
   }, [register]);
+
+  // Check authentication on component mount
+  useEffect(() => {
+    if (!user) {
+      toast.error('You must be logged in to create a venue');
+      navigate('/login');
+    }
+  }, [user, navigate]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -75,6 +85,11 @@ const AddVenueForm: React.FC = () => {
   const onSubmit = async (data: VenueFormData) => {
     console.log('Form submitted with data:', data);
     
+    if (!user) {
+      toast.error('You must be logged in to create a venue');
+      return;
+    }
+
     if (images.length === 0) {
       toast.error('Please upload at least one image');
       return;
@@ -87,13 +102,7 @@ const AddVenueForm: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) {
-        toast.error('You must be logged in to create a venue');
-        return;
-      }
-
-      console.log('Creating venue for user:', user.user.id);
+      console.log('Creating venue for user:', user.id);
 
       // Create venue
       const { data: venue, error: venueError } = await supabase
@@ -104,7 +113,7 @@ const AddVenueForm: React.FC = () => {
           capacity: Number(data.capacity),
           city: data.city,
           address: data.address,
-          host_id: user.user.id,
+          host_id: user.id,
           price_per_hour: data.pricePerHour ? Number(data.pricePerHour) : null,
           price_per_day: data.pricePerDay ? Number(data.pricePerDay) : null,
           price_per_event: data.pricePerEvent ? Number(data.pricePerEvent) : null,
@@ -114,15 +123,14 @@ const AddVenueForm: React.FC = () => {
 
       if (venueError) {
         console.error('Venue creation error:', venueError);
-        throw venueError;
+        throw new Error(venueError.message || 'Failed to create venue');
       }
 
       console.log('Venue created successfully:', venue);
 
       // Upload images
-      for (let i = 0; i < images.length; i++) {
-        const file = images[i];
-        const fileName = `${user.user.id}/${venue.id}/${Date.now()}_${file.name}`;
+      const imageUploadPromises = images.map(async (file, i) => {
+        const fileName = `${user.id}/${venue.id}/${Date.now()}_${i}_${file.name}`;
         
         console.log('Uploading image:', fileName);
 
@@ -132,8 +140,7 @@ const AddVenueForm: React.FC = () => {
 
         if (uploadError) {
           console.error('Image upload error:', uploadError);
-          // Continue with other images even if one fails
-          continue;
+          throw new Error(`Failed to upload image: ${uploadError.message}`);
         }
 
         const { data: { publicUrl } } = supabase.storage
@@ -151,8 +158,11 @@ const AddVenueForm: React.FC = () => {
 
         if (imageRecordError) {
           console.error('Image record error:', imageRecordError);
+          throw new Error(`Failed to save image record: ${imageRecordError.message}`);
         }
-      }
+      });
+
+      await Promise.all(imageUploadPromises);
 
       // Add features
       if (selectedFeatures.length > 0) {
@@ -167,18 +177,30 @@ const AddVenueForm: React.FC = () => {
 
         if (featuresError) {
           console.error('Features error:', featuresError);
+          throw new Error(`Failed to save features: ${featuresError.message}`);
         }
       }
 
       toast.success('Venue created successfully!');
       navigate('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating venue:', error);
-      toast.error(`Failed to create venue: ${error.message || 'Please try again.'}`);
+      toast.error(error.message || 'Failed to create venue. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (!user) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-8">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Authentication Required</h1>
+          <p className="text-gray-600 dark:text-gray-400">Please log in to create a venue</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
