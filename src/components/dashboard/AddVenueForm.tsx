@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -51,6 +50,11 @@ const AddVenueForm: React.FC = () => {
 
   const selectedCity = watch('city');
 
+  // Ensure the city field is properly registered
+  React.useEffect(() => {
+    register('city', { required: 'City is required' });
+  }, [register]);
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     setImages(prev => [...prev, ...files].slice(0, 8)); // Max 8 images
@@ -69,23 +73,38 @@ const AddVenueForm: React.FC = () => {
   };
 
   const onSubmit = async (data: VenueFormData) => {
+    console.log('Form submitted with data:', data);
+    
     if (images.length === 0) {
       toast.error('Please upload at least one image');
+      return;
+    }
+
+    if (!data.city) {
+      toast.error('Please select a city');
       return;
     }
 
     setIsSubmitting(true);
     try {
       const { data: user } = await supabase.auth.getUser();
-      if (!user.user) throw new Error('Not authenticated');
+      if (!user.user) {
+        toast.error('You must be logged in to create a venue');
+        return;
+      }
+
+      console.log('Creating venue for user:', user.user.id);
 
       // Create venue
       const { data: venue, error: venueError } = await supabase
         .from('venues')
         .insert({
-          ...data,
-          host_id: user.user.id,
+          name: data.name,
+          description: data.description,
           capacity: Number(data.capacity),
+          city: data.city,
+          address: data.address,
+          host_id: user.user.id,
           price_per_hour: data.pricePerHour ? Number(data.pricePerHour) : null,
           price_per_day: data.pricePerDay ? Number(data.pricePerDay) : null,
           price_per_event: data.pricePerEvent ? Number(data.pricePerEvent) : null,
@@ -93,36 +112,51 @@ const AddVenueForm: React.FC = () => {
         .select()
         .single();
 
-      if (venueError) throw venueError;
+      if (venueError) {
+        console.error('Venue creation error:', venueError);
+        throw venueError;
+      }
+
+      console.log('Venue created successfully:', venue);
 
       // Upload images
       for (let i = 0; i < images.length; i++) {
         const file = images[i];
         const fileName = `${user.user.id}/${venue.id}/${Date.now()}_${file.name}`;
         
+        console.log('Uploading image:', fileName);
+
         const { error: uploadError } = await supabase.storage
           .from('venue-images')
           .upload(fileName, file);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Image upload error:', uploadError);
+          // Continue with other images even if one fails
+          continue;
+        }
 
         const { data: { publicUrl } } = supabase.storage
           .from('venue-images')
           .getPublicUrl(fileName);
 
         // Save image record
-        await supabase
+        const { error: imageRecordError } = await supabase
           .from('venue_images')
           .insert({
             venue_id: venue.id,
             image_url: publicUrl,
             is_primary: i === 0, // First image is primary
           });
+
+        if (imageRecordError) {
+          console.error('Image record error:', imageRecordError);
+        }
       }
 
       // Add features
       if (selectedFeatures.length > 0) {
-        await supabase
+        const { error: featuresError } = await supabase
           .from('venue_features')
           .insert(
             selectedFeatures.map(feature => ({
@@ -130,13 +164,17 @@ const AddVenueForm: React.FC = () => {
               feature_name: feature,
             }))
           );
+
+        if (featuresError) {
+          console.error('Features error:', featuresError);
+        }
       }
 
       toast.success('Venue created successfully!');
       navigate('/dashboard');
     } catch (error) {
       console.error('Error creating venue:', error);
-      toast.error('Failed to create venue. Please try again.');
+      toast.error(`Failed to create venue: ${error.message || 'Please try again.'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -198,7 +236,7 @@ const AddVenueForm: React.FC = () => {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="city">City *</Label>
-              <Select onValueChange={(value) => setValue('city', value)}>
+              <Select onValueChange={(value) => setValue('city', value)} value={selectedCity}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a city in Algeria" />
                 </SelectTrigger>
