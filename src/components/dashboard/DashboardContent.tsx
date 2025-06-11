@@ -6,6 +6,8 @@ import AddVenueForm from './AddVenueForm';
 import BookingsManagement from './BookingsManagement';
 import MessagesView from './MessagesView';
 import DashboardSettings from './DashboardSettings';
+import VenueAvailability from './VenueAvailability';
+import MessageThread from '../messaging/MessageThread';
 
 const DashboardContent: React.FC = () => {
   return (
@@ -15,6 +17,8 @@ const DashboardContent: React.FC = () => {
         <Route path="add-venue" element={<AddVenueForm />} />
         <Route path="bookings" element={<BookingsManagement />} />
         <Route path="messages" element={<MessagesView />} />
+        <Route path="messages/:conversationId" element={<MessageThread />} />
+        <Route path="venues/:venueId/availability" element={<VenueAvailability />} />
         <Route path="settings" element={<DashboardSettings />} />
       </Routes>
     </div>

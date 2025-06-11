@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Users, DollarSign, Calendar, Edit, Trash2 } from 'lucide-react';
+import { MapPin, Users, DollarSign, Calendar, Edit, Trash2, Eye, Power } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -77,16 +77,43 @@ const VenuesList: React.FC = () => {
 
   const toggleVenueStatusMutation = useMutation({
     mutationFn: async ({ venueId, isActive }: { venueId: string; isActive: boolean }) => {
-      const { error } = await supabase
+      const newStatus = !isActive;
+      
+      // Update venue status
+      const { error: venueError } = await supabase
         .from('venues')
-        .update({ is_active: !isActive, updated_at: new Date().toISOString() })
+        .update({ is_active: newStatus, updated_at: new Date().toISOString() })
         .eq('id', venueId);
 
-      if (error) throw error;
+      if (venueError) throw venueError;
+
+      // Update availability based on venue status
+      if (newStatus) {
+        // If activating venue, set all future dates as available
+        const { error: availabilityError } = await supabase
+          .from('venue_availability')
+          .upsert({
+            venue_id: venueId,
+            date: new Date().toISOString().split('T')[0],
+            is_available: true,
+            notes: 'Venue activated'
+          });
+        
+        if (availabilityError) console.warn('Could not update availability:', availabilityError);
+      } else {
+        // If deactivating venue, set all future dates as unavailable
+        const { error: availabilityError } = await supabase
+          .from('venue_availability')
+          .update({ is_available: false, notes: 'Venue deactivated' })
+          .eq('venue_id', venueId)
+          .gte('date', new Date().toISOString().split('T')[0]);
+        
+        if (availabilityError) console.warn('Could not update availability:', availabilityError);
+      }
     },
-    onSuccess: () => {
+    onSuccess: (_, { isActive }) => {
       queryClient.invalidateQueries({ queryKey: ['host-venues'] });
-      toast.success('Venue status updated');
+      toast.success(`Venue ${!isActive ? 'activated' : 'deactivated'} successfully`);
     },
     onError: (error) => {
       console.error('Error updating venue status:', error);
@@ -169,7 +196,7 @@ const VenuesList: React.FC = () => {
                       disabled={toggleVenueStatusMutation.isPending}
                       title={venue.is_active ? 'Deactivate venue' : 'Activate venue'}
                     >
-                      <Edit className="h-4 w-4" />
+                      <Power className={`h-4 w-4 ${venue.is_active ? 'text-green-600' : 'text-gray-400'}`} />
                     </Button>
                     <Button 
                       variant="ghost" 
@@ -222,11 +249,18 @@ const VenuesList: React.FC = () => {
                 )}
                 
                 <div className="flex justify-between pt-4">
-                  <Button variant="outline" size="sm">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    Availability
-                  </Button>
-                  <Button size="sm">View Details</Button>
+                  <Link to={`/dashboard/venues/${venue.id}/availability`}>
+                    <Button variant="outline" size="sm">
+                      <Calendar className="h-4 w-4 mr-1" />
+                      Availability
+                    </Button>
+                  </Link>
+                  <Link to={`/venues/${venue.id}`}>
+                    <Button size="sm">
+                      <Eye className="h-4 w-4 mr-1" />
+                      View Details
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
