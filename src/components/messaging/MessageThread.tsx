@@ -28,8 +28,8 @@ const MessageThread: React.FC = () => {
         .from('conversations')
         .select(`
           *,
-          venue:venues(name, city),
-          booking:bookings(event_date, guest_count)
+          venues(name, city),
+          bookings(event_date, guest_count)
         `)
         .eq('id', conversationId)
         .single();
@@ -118,7 +118,7 @@ const MessageThread: React.FC = () => {
         </Button>
         <div>
           <h1 className="text-2xl font-bold">Conversation with {otherPartyName}</h1>
-          <p className="text-gray-600">Re: {conversation.venue?.name}</p>
+          <p className="text-gray-600">Re: {conversation.venues?.name}</p>
         </div>
       </div>
 
@@ -182,22 +182,22 @@ const MessageThread: React.FC = () => {
               <CardTitle>Venue Details</CardTitle>
             </CardHeader>
             <CardContent>
-              <h3 className="font-semibold">{conversation.venue?.name}</h3>
-              <p className="text-sm text-gray-600">{conversation.venue?.city}</p>
+              <h3 className="font-semibold">{conversation.venues?.name}</h3>
+              <p className="text-sm text-gray-600">{conversation.venues?.city}</p>
             </CardContent>
           </Card>
 
-          {conversation.booking && (
+          {conversation.bookings && (
             <Card>
               <CardHeader>
                 <CardTitle>Booking Details</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm">
-                  <strong>Date:</strong> {new Date(conversation.booking.event_date).toLocaleDateString()}
+                  <strong>Date:</strong> {new Date(conversation.bookings.event_date).toLocaleDateString()}
                 </p>
                 <p className="text-sm">
-                  <strong>Guests:</strong> {conversation.booking.guest_count}
+                  <strong>Guests:</strong> {conversation.bookings.guest_count}
                 </p>
               </CardContent>
             </Card>

@@ -65,6 +65,86 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          guest_id: string
+          host_id: string
+          id: string
+          updated_at: string
+          venue_id: string
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          guest_id: string
+          host_id: string
+          id?: string
+          updated_at?: string
+          venue_id: string
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          guest_id?: string
+          host_id?: string
+          id?: string
+          updated_at?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          is_read: boolean | null
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       venue_availability: {
         Row: {
           created_at: string

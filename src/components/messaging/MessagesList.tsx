@@ -2,9 +2,8 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { MessageCircle, Calendar, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -22,8 +21,8 @@ const MessagesList: React.FC = () => {
         .from('conversations')
         .select(`
           *,
-          venue:venues(name, city),
-          messages:messages(
+          venues(name, city),
+          messages(
             content,
             created_at,
             sender_id
@@ -83,10 +82,10 @@ const MessagesList: React.FC = () => {
                     )}
                   </div>
                   <span className="text-sm text-gray-500">
-                    {conversation.venue && (
+                    {conversation.venues && (
                       <div className="flex items-center text-xs">
                         <MapPin className="h-3 w-3 mr-1" />
-                        {conversation.venue.city}
+                        {conversation.venues.city}
                       </div>
                     )}
                   </span>
@@ -94,7 +93,7 @@ const MessagesList: React.FC = () => {
                 
                 <div className="mb-2">
                   <h4 className="text-sm font-medium text-gray-700">
-                    Re: {conversation.venue?.name || 'Venue Inquiry'}
+                    Re: {conversation.venues?.name || 'Venue Inquiry'}
                   </h4>
                 </div>
                 
