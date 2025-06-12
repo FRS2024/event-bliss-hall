@@ -10,12 +10,14 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Calendar as CalendarIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import UnavailabilityForm, { UnavailabilityData } from './UnavailabilityForm';
 
 const VenueAvailability: React.FC = () => {
   const { venueId } = useParams<{ venueId: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [showUnavailabilityForm, setShowUnavailabilityForm] = useState(false);
 
   const { data: venue } = useQuery({
     queryKey: ['venue', venueId],
@@ -52,23 +54,61 @@ const VenueAvailability: React.FC = () => {
   });
 
   const updateAvailabilityMutation = useMutation({
-    mutationFn: async ({ date, isAvailable }: { date: string; isAvailable: boolean }) => {
+    mutationFn: async ({ 
+      date, 
+      isAvailable, 
+      unavailabilityData 
+    }: { 
+      date: string; 
+      isAvailable: boolean; 
+      unavailabilityData?: UnavailabilityData;
+    }) => {
       if (!venueId) throw new Error('Venue ID required');
 
-      const { error } = await supabase
+      console.log('Updating availability:', { date, isAvailable, unavailabilityData });
+
+      let notes = '';
+      if (!isAvailable && unavailabilityData) {
+        if (unavailabilityData.isExteriorBooking) {
+          notes = `Exterior Booking - Guest: ${unavailabilityData.guestFullName}, Phone: ${unavailabilityData.guestPhone}`;
+          if (unavailabilityData.guestEmail) {
+            notes += `, Email: ${unavailabilityData.guestEmail}`;
+          }
+          if (unavailabilityData.notes) {
+            notes += `, Notes: ${unavailabilityData.notes}`;
+          }
+        } else {
+          notes = unavailabilityData.notes || 'Unavailable';
+        }
+      } else if (isAvailable) {
+        notes = 'Available';
+      }
+
+      const { data, error } = await supabase
         .from('venue_availability')
         .upsert({
           venue_id: venueId,
           date,
           is_available: isAvailable,
-          notes: isAvailable ? 'Available' : 'Unavailable'
-        });
+          notes
+        }, {
+          onConflict: 'venue_id,date'
+        })
+        .select();
 
-      if (error) throw error;
+      console.log('Supabase response:', { data, error });
+
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['venue-availability', venueId] });
       toast.success('Availability updated successfully');
+      setShowUnavailabilityForm(false);
     },
     onError: (error) => {
       console.error('Error updating availability:', error);
@@ -76,9 +116,28 @@ const VenueAvailability: React.FC = () => {
     }
   });
 
-  const handleDateToggle = (date: Date, isAvailable: boolean) => {
+  const handleMarkAvailable = (date: Date) => {
     const dateString = format(date, 'yyyy-MM-dd');
-    updateAvailabilityMutation.mutate({ date: dateString, isAvailable });
+    updateAvailabilityMutation.mutate({ 
+      date: dateString, 
+      isAvailable: true 
+    });
+  };
+
+  const handleMarkUnavailable = (date: Date) => {
+    setSelectedDate(date);
+    setShowUnavailabilityForm(true);
+  };
+
+  const handleUnavailabilitySubmit = (unavailabilityData: UnavailabilityData) => {
+    if (!selectedDate) return;
+    
+    const dateString = format(selectedDate, 'yyyy-MM-dd');
+    updateAvailabilityMutation.mutate({ 
+      date: dateString, 
+      isAvailable: false,
+      unavailabilityData
+    });
   };
 
   const getDateAvailability = (date: Date) => {
@@ -157,20 +216,30 @@ const VenueAvailability: React.FC = () => {
                 
                 <div className="flex space-x-2">
                   <Button
-                    onClick={() => handleDateToggle(selectedDate, true)}
+                    onClick={() => handleMarkAvailable(selectedDate)}
                     disabled={updateAvailabilityMutation.isPending}
                     variant={isDateAvailable(selectedDate) ? "secondary" : "default"}
                   >
                     Mark Available
                   </Button>
                   <Button
-                    onClick={() => handleDateToggle(selectedDate, false)}
+                    onClick={() => handleMarkUnavailable(selectedDate)}
                     disabled={updateAvailabilityMutation.isPending}
                     variant={!isDateAvailable(selectedDate) ? "secondary" : "destructive"}
                   >
                     Mark Unavailable
                   </Button>
                 </div>
+
+                {/* Show availability details if date is unavailable */}
+                {!isDateAvailable(selectedDate) && (
+                  <div className="pt-4 border-t">
+                    <h4 className="font-medium mb-2">Unavailability Details</h4>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                      {getDateAvailability(selectedDate)?.notes || 'No details available'}
+                    </div>
+                  </div>
+                )}
               </>
             )}
             
@@ -190,6 +259,16 @@ const VenueAvailability: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Unavailability Form Modal */}
+      {showUnavailabilityForm && selectedDate && (
+        <UnavailabilityForm
+          date={format(selectedDate, 'MMMM d, yyyy')}
+          onSubmit={handleUnavailabilitySubmit}
+          onCancel={() => setShowUnavailabilityForm(false)}
+          isLoading={updateAvailabilityMutation.isPending}
+        />
+      )}
     </div>
   );
 };
