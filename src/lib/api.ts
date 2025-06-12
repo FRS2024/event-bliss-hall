@@ -55,6 +55,35 @@ export const getFeaturedVenues = async (): Promise<Venue[]> => {
   }
 };
 
+export const getVenueById = async (id: string): Promise<Venue | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('venues')
+      .select(`
+        *,
+        venue_images (
+          image_url,
+          is_primary
+        ),
+        venue_features (
+          feature_name
+        )
+      `)
+      .eq('id', id)
+      .eq('is_active', true)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) return null;
+
+    const mappedVenues = mapVenuesToInterface([data]);
+    return mappedVenues[0] || null;
+  } catch (error) {
+    console.error('Error fetching venue by ID:', error);
+    return null;
+  }
+};
+
 const mapVenuesToInterface = (rawVenues: any[]): Venue[] => {
   return rawVenues.map(venue => {
     const primaryImage = venue.venue_images?.find((img: any) => img.is_primary)?.image_url;
@@ -82,7 +111,7 @@ const mapVenuesToInterface = (rawVenues: any[]): Venue[] => {
       rating: 4.5, // Default rating since reviews aren't implemented
       reviewCount: 0,
       availability: 'Available',
-      hostId: venue.host_id,
+      host_id: venue.host_id,
       is_active: venue.is_active
     } as Venue;
   });
