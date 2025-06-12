@@ -25,7 +25,8 @@ const MessagesList: React.FC = () => {
           messages(
             content,
             created_at,
-            sender_id
+            sender_id,
+            is_read
           )
         `)
         .or(`host_id.eq.${user.id},guest_id.eq.${user.id}`)
