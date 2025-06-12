@@ -111,7 +111,7 @@ const mapVenuesToInterface = (rawVenues: any[]): Venue[] => {
       rating: 4.5, // Default rating since reviews aren't implemented
       reviewCount: 0,
       availability: 'Available',
-      host_id: venue.host_id,
+      hostId: venue.host_id,
       is_active: venue.is_active
     } as Venue;
   });
