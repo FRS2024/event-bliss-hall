@@ -12,12 +12,20 @@ interface VenueCardProps {
 const VenueCard: React.FC<VenueCardProps> = ({ venue }) => {
   const [isLiked, setIsLiked] = React.useState(false);
   
+  // Determine price display
+  const priceDisplay = () => {
+    if (venue.price_per_day) return `${venue.price_per_day} DA/day`;
+    if (venue.price_per_hour) return `${venue.price_per_hour} DA/hr`;
+    if (venue.price_per_event) return `${venue.price_per_event} DA/event`;
+    return `${venue.price} DA`;
+  };
+  
   return (
     <div className="venue-card group">
       <div className="relative">
         <Link to={`/venues/${venue.id}`}>
           <img
-            src={venue.images[0]}
+            src={venue.images[0] || '/placeholder.svg'}
             alt={venue.name}
             className="w-full h-60 object-cover transition-transform duration-300 group-hover:scale-105"
           />
@@ -54,7 +62,7 @@ const VenueCard: React.FC<VenueCardProps> = ({ venue }) => {
         
         <div className="flex items-center text-muted-foreground mb-3">
           <MapPin size={16} className="mr-1" />
-          <span className="text-sm truncate">{venue.location}</span>
+          <span className="text-sm truncate">{venue.city}</span>
         </div>
         
         <div className="flex items-center space-x-4 mb-4 text-sm text-muted-foreground">
@@ -70,8 +78,7 @@ const VenueCard: React.FC<VenueCardProps> = ({ venue }) => {
         
         <div className="flex justify-between items-center">
           <div>
-            <span className="font-script text-xl text-blush-500 dark:text-blush-400">${venue.price}</span>
-            <span className="text-muted-foreground text-sm">/day</span>
+            <span className="font-script text-xl text-blush-500 dark:text-blush-400">{priceDisplay()}</span>
           </div>
           <Link to={`/venues/${venue.id}`}>
             <Button className="bg-blush-400 hover:bg-blush-500 text-white">

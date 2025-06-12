@@ -1,4 +1,3 @@
-
 export interface Venue {
   id: string;
   name: string;
@@ -14,6 +13,12 @@ export interface Venue {
   availability: string;
   reviews?: Review[];
   hostId: string;
+  city: string;
+  address: string;
+  price_per_hour?: number;
+  price_per_day?: number;
+  price_per_event?: number;
+  is_active?: boolean;
 }
 
 export interface Review {
