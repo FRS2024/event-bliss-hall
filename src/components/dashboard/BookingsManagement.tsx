@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, MapPin, Users, DollarSign } from 'lucide-react';
 import { toast } from 'sonner';
+import { updateVenueAvailability } from '@/lib/api';
 
 const BookingsManagement: React.FC = () => {
   const queryClient = useQueryClient();
@@ -35,17 +35,34 @@ const BookingsManagement: React.FC = () => {
   });
 
   const updateBookingMutation = useMutation({
-    mutationFn: async ({ bookingId, status }: { bookingId: string; status: string }) => {
+    mutationFn: async ({ bookingId, status, venueId, eventDate }: { 
+      bookingId: string; 
+      status: string; 
+      venueId: string; 
+      eventDate: string; 
+    }) => {
       const { error } = await supabase
         .from('bookings')
         .update({ status, updated_at: new Date().toISOString() })
         .eq('id', bookingId);
 
       if (error) throw error;
+
+      // Update venue availability based on booking status
+      if (status === 'confirmed') {
+        await updateVenueAvailability(venueId, eventDate, false);
+      } else if (status === 'cancelled') {
+        await updateVenueAvailability(venueId, eventDate, true);
+      }
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['host-bookings'] });
-      toast.success('Booking status updated successfully');
+      const statusMessage = variables.status === 'confirmed' 
+        ? 'Booking confirmed and venue availability updated'
+        : variables.status === 'cancelled'
+        ? 'Booking cancelled and venue availability updated'
+        : 'Booking status updated successfully';
+      toast.success(statusMessage);
     },
     onError: (error) => {
       console.error('Error updating booking:', error);
@@ -53,8 +70,8 @@ const BookingsManagement: React.FC = () => {
     }
   });
 
-  const handleStatusUpdate = (bookingId: string, status: string) => {
-    updateBookingMutation.mutate({ bookingId, status });
+  const handleStatusUpdate = (bookingId: string, status: string, venueId: string, eventDate: string) => {
+    updateBookingMutation.mutate({ bookingId, status, venueId, eventDate });
   };
 
   if (isLoading) {
@@ -163,7 +180,7 @@ const BookingsManagement: React.FC = () => {
                 <div className="flex space-x-2">
                   <Button 
                     size="sm" 
-                    onClick={() => handleStatusUpdate(booking.id, 'confirmed')}
+                    onClick={() => handleStatusUpdate(booking.id, 'confirmed', booking.venue_id, booking.event_date)}
                     disabled={updateBookingMutation.isPending}
                   >
                     Accept
@@ -171,7 +188,7 @@ const BookingsManagement: React.FC = () => {
                   <Button 
                     size="sm" 
                     variant="outline"
-                    onClick={() => handleStatusUpdate(booking.id, 'cancelled')}
+                    onClick={() => handleStatusUpdate(booking.id, 'cancelled', booking.venue_id, booking.event_date)}
                     disabled={updateBookingMutation.isPending}
                   >
                     Decline

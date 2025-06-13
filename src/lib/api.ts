@@ -123,6 +123,18 @@ export const createBooking = async (bookingData: {
       throw new Error('Venue is not available on the selected date');
     }
 
+    // Check for existing confirmed bookings on the same date
+    const { data: existingBookings } = await supabase
+      .from('bookings')
+      .select('id')
+      .eq('venue_id', bookingData.venueId)
+      .eq('event_date', bookingData.eventDate)
+      .eq('status', 'confirmed');
+
+    if (existingBookings && existingBookings.length > 0) {
+      throw new Error('Venue is already booked for this date');
+    }
+
     // Calculate total price (prioritize day rate, then event rate, then hourly)
     let totalPrice = venue.price_per_day || venue.price_per_hour || venue.price_per_event || 0;
 
@@ -256,6 +268,49 @@ export const getUserVenues = async (): Promise<Venue[]> => {
   } catch (error) {
     console.error('Error fetching user venues:', error);
     return [];
+  }
+};
+
+export const updateVenueAvailability = async (venueId: string, date: string, isAvailable: boolean) => {
+  try {
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user) throw new Error('Authentication required');
+
+    // Check if availability record already exists
+    const { data: existing } = await supabase
+      .from('venue_availability')
+      .select('id')
+      .eq('venue_id', venueId)
+      .eq('date', date)
+      .maybeSingle();
+
+    if (existing) {
+      // Update existing record
+      const { error } = await supabase
+        .from('venue_availability')
+        .update({ 
+          is_available: isAvailable,
+          notes: isAvailable ? null : 'Booked'
+        })
+        .eq('id', existing.id);
+
+      if (error) throw error;
+    } else {
+      // Create new record
+      const { error } = await supabase
+        .from('venue_availability')
+        .insert({
+          venue_id: venueId,
+          date: date,
+          is_available: isAvailable,
+          notes: isAvailable ? null : 'Booked'
+        });
+
+      if (error) throw error;
+    }
+  } catch (error) {
+    console.error('Error updating venue availability:', error);
+    throw error;
   }
 };
 
