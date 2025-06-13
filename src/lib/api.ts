@@ -124,7 +124,7 @@ export const createBooking = async (bookingData: {
     }
 
     // Calculate total price (prioritize day rate, then event rate, then hourly)
-    let totalPrice = venue.price_per_day || venue.price_per_event || venue.price_per_hour || 0;
+    let totalPrice = venue.price_per_day || venue.price_per_hour || venue.price_per_event || 0;
 
     const { data, error } = await supabase
       .from('bookings')
@@ -226,6 +226,36 @@ export const sendMessage = async (conversationId: string, content: string) => {
   } catch (error) {
     console.error('Error sending message:', error);
     throw error;
+  }
+};
+
+export const getUserVenues = async (): Promise<Venue[]> => {
+  try {
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user) throw new Error('Authentication required');
+
+    const { data, error } = await supabase
+      .from('venues')
+      .select(`
+        *,
+        venue_images (
+          image_url,
+          is_primary
+        ),
+        venue_features (
+          feature_name
+        )
+      `)
+      .eq('host_id', user.user.id)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return mapVenuesToInterface(data || []);
+  } catch (error) {
+    console.error('Error fetching user venues:', error);
+    return [];
   }
 };
 

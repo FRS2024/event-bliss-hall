@@ -10,23 +10,37 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useUserRole } from '@/hooks/useUserRole';
 
 const DashboardSidebar: React.FC = () => {
   const location = useLocation();
+  const userRole = useUserRole();
   
-  const menuItems = [
-    { icon: Home, label: 'Overview', path: '/dashboard' },
-    { icon: Plus, label: 'Add Venue', path: '/dashboard/add-venue' },
-    { icon: Calendar, label: 'Bookings', path: '/dashboard/bookings' },
-    { icon: MessageSquare, label: 'Messages', path: '/dashboard/messages' },
-    { icon: Settings, label: 'Settings', path: '/dashboard/settings' },
+  // Define all menu items with role restrictions
+  const allMenuItems = [
+    { icon: Home, label: 'Overview', path: '/dashboard', roles: ['host'] },
+    { icon: Plus, label: 'Add Venue', path: '/dashboard/add-venue', roles: ['host'] },
+    { icon: Calendar, label: 'Bookings', path: '/dashboard/bookings', roles: ['host', 'guest'] },
+    { icon: MessageSquare, label: 'Messages', path: '/dashboard/messages', roles: ['host', 'guest'] },
+    { icon: Settings, label: 'Settings', path: '/dashboard/settings', roles: ['host'] },
   ];
+
+  // Filter menu items based on user role
+  const menuItems = userRole === 'loading' 
+    ? [] 
+    : allMenuItems.filter(item => item.roles.includes(userRole));
+
+  // Determine dashboard title based on role
+  const getDashboardTitle = () => {
+    if (userRole === 'loading') return 'Dashboard';
+    return userRole === 'host' ? 'Host Dashboard' : 'Guest Dashboard';
+  };
 
   return (
     <Sidebar>
       <SidebarHeader className="p-4">
         <h2 className="text-xl font-semibold text-blush-600 dark:text-blush-400">
-          Host Dashboard
+          {getDashboardTitle()}
         </h2>
       </SidebarHeader>
       <SidebarContent>
