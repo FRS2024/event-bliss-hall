@@ -30,6 +30,18 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
     setPreviewUrl(currentAvatarUrl);
   }, [currentAvatarUrl]);
 
+  const invalidateAllQueries = () => {
+    // Invalidate all profile-related queries to ensure fresh data everywhere
+    queryClient.invalidateQueries({ queryKey: ['profile'] });
+    queryClient.invalidateQueries({ queryKey: ['user-profile'] });
+    queryClient.invalidateQueries({ queryKey: ['auth'] });
+    
+    // Force refetch of the current user's profile
+    queryClient.refetchQueries({ queryKey: ['profile', user?.id] });
+    
+    console.log('🔄 All profile queries invalidated and refetched');
+  };
+
   const uploadAvatar = async (file: File) => {
     if (!user) {
       toast.error('You must be logged in to upload an avatar');
@@ -39,7 +51,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
     setUploading(true);
     
     try {
-      console.log('Starting avatar upload for user:', user.id);
+      console.log('📤 Starting avatar upload for user:', user.id);
       
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}.${fileExt}`;
@@ -49,7 +61,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
       if (currentAvatarUrl) {
         const oldPath = currentAvatarUrl.split('/').pop();
         if (oldPath) {
-          console.log('Deleting old avatar:', `${user.id}/${oldPath}`);
+          console.log('🗑️ Deleting old avatar:', `${user.id}/${oldPath}`);
           await supabase.storage
             .from('avatars')
             .remove([`${user.id}/${oldPath}`]);
@@ -57,13 +69,13 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
       }
 
       // Upload new avatar
-      console.log('Uploading new avatar to:', filePath);
+      console.log('📤 Uploading new avatar to:', filePath);
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file, { upsert: true });
 
       if (uploadError) {
-        console.error('Upload error:', uploadError);
+        console.error('❌ Upload error:', uploadError);
         throw uploadError;
       }
 
@@ -72,7 +84,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
         .from('avatars')
         .getPublicUrl(filePath);
 
-      console.log('Avatar uploaded, public URL:', publicUrl);
+      console.log('🔗 Avatar uploaded, public URL:', publicUrl);
 
       // Update profile with new avatar URL
       const { error: updateError } = await supabase
@@ -84,19 +96,29 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
         .eq('id', user.id);
 
       if (updateError) {
-        console.error('Profile update error:', updateError);
+        console.error('❌ Profile update error:', updateError);
         throw updateError;
       }
 
+      // Update local state immediately
       setPreviewUrl(publicUrl);
       onAvatarUpdate(publicUrl);
       
-      // Invalidate profile queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+      // Optimistically update the query cache
+      queryClient.setQueryData(['profile', user.id], (oldData: any) => {
+        if (oldData) {
+          return { ...oldData, avatar_url: publicUrl };
+        }
+        return oldData;
+      });
       
-      toast.success('Avatar updated successfully!');
+      // Invalidate and refetch all related queries
+      invalidateAllQueries();
+      
+      toast.success('Avatar updated successfully! 🎉');
+      console.log('✅ Avatar upload complete and cache updated');
     } catch (error: any) {
-      console.error('Error uploading avatar:', error);
+      console.error('❌ Error uploading avatar:', error);
       toast.error(`Failed to upload avatar: ${error.message}`);
     } finally {
       setUploading(false);
@@ -109,12 +131,12 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
     setUploading(true);
     
     try {
-      console.log('Removing avatar for user:', user.id);
+      console.log('🗑️ Removing avatar for user:', user.id);
       
       // Delete from storage
       const fileName = currentAvatarUrl.split('/').pop();
       if (fileName) {
-        console.log('Deleting avatar file:', `${user.id}/${fileName}`);
+        console.log('🗑️ Deleting avatar file:', `${user.id}/${fileName}`);
         await supabase.storage
           .from('avatars')
           .remove([`${user.id}/${fileName}`]);
@@ -130,19 +152,29 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
         .eq('id', user.id);
 
       if (error) {
-        console.error('Profile update error:', error);
+        console.error('❌ Profile update error:', error);
         throw error;
       }
 
+      // Update local state immediately
       setPreviewUrl(null);
       onAvatarUpdate(null);
       
-      // Invalidate profile queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+      // Optimistically update the query cache
+      queryClient.setQueryData(['profile', user.id], (oldData: any) => {
+        if (oldData) {
+          return { ...oldData, avatar_url: null };
+        }
+        return oldData;
+      });
       
-      toast.success('Avatar removed successfully!');
+      // Invalidate and refetch all related queries
+      invalidateAllQueries();
+      
+      toast.success('Avatar removed successfully! 🗑️');
+      console.log('✅ Avatar removal complete and cache updated');
     } catch (error: any) {
-      console.error('Error removing avatar:', error);
+      console.error('❌ Error removing avatar:', error);
       toast.error(`Failed to remove avatar: ${error.message}`);
     } finally {
       setUploading(false);
@@ -153,7 +185,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    console.log('File selected:', file.name, file.size, file.type);
+    console.log('📁 File selected:', file.name, file.size, file.type);
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
@@ -219,6 +251,12 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
           <p className="text-xs text-gray-500">
             PNG, JPG up to 5MB
           </p>
+          
+          {previewUrl && (
+            <p className="text-xs text-gray-400">
+              Current: {previewUrl.slice(-30)}...
+            </p>
+          )}
         </div>
       </div>
     </div>

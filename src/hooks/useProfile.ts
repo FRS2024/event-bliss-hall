@@ -24,7 +24,7 @@ export const useProfile = () => {
     queryFn: async () => {
       if (!user) throw new Error('Not authenticated');
 
-      console.log('Fetching profile for user:', user.id);
+      console.log('🔍 Fetching profile for user:', user.id);
       
       const { data, error } = await supabase
         .from('profiles')
@@ -33,21 +33,24 @@ export const useProfile = () => {
         .single();
 
       if (error) {
-        console.error('Error fetching profile:', error);
+        console.error('❌ Error fetching profile:', error);
         throw error;
       }
       
-      console.log('Profile fetched:', data);
+      console.log('✅ Profile fetched successfully:', data);
+      console.log('🖼️ Avatar URL in profile:', data?.avatar_url);
       return data as Profile;
     },
     enabled: !!user,
+    staleTime: 0, // Always fetch fresh data
+    cacheTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: Partial<Profile>) => {
       if (!user) throw new Error('Not authenticated');
 
-      console.log('Updating profile with:', updates);
+      console.log('🔄 Updating profile with:', updates);
       
       const { data, error } = await supabase
         .from('profiles')
@@ -60,21 +63,30 @@ export const useProfile = () => {
         .single();
 
       if (error) {
-        console.error('Error updating profile:', error);
+        console.error('❌ Error updating profile:', error);
         throw error;
       }
       
-      console.log('Profile updated:', data);
+      console.log('✅ Profile updated successfully:', data);
       return data;
     },
     onSuccess: (data) => {
-      console.log('Profile update successful:', data);
+      console.log('🎉 Profile update mutation successful:', data);
+      
+      // Update the cache immediately
       queryClient.setQueryData(['profile', user?.id], data);
-      queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
+      
+      // Invalidate all related queries to force refresh
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['user-profile'] });
+      
+      // Also invalidate any auth-related queries that might cache user data
+      queryClient.invalidateQueries({ queryKey: ['auth'] });
+      
       toast.success('Profile updated successfully!');
     },
     onError: (error) => {
-      console.error('Error updating profile:', error);
+      console.error('❌ Error in profile update mutation:', error);
       toast.error(`Failed to update profile: ${error.message}`);
     }
   });
@@ -94,7 +106,7 @@ export const useUserProfile = (userId: string) => {
     queryFn: async () => {
       if (!userId) throw new Error('User ID required');
 
-      console.log('Fetching user profile for:', userId);
+      console.log('🔍 Fetching user profile for:', userId);
       
       const { data, error } = await supabase
         .from('profiles')
@@ -103,14 +115,15 @@ export const useUserProfile = (userId: string) => {
         .single();
 
       if (error) {
-        console.error('Error fetching user profile:', error);
+        console.error('❌ Error fetching user profile:', error);
         throw error;
       }
       
-      console.log('User profile fetched:', data);
+      console.log('✅ User profile fetched:', data);
       return data as Profile;
     },
     enabled: !!userId,
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 
   return { profile, isLoading, error };

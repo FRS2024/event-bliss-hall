@@ -23,16 +23,24 @@ interface UserDropdownProps {
 const UserDropdown: React.FC<UserDropdownProps> = ({ onSignOut }) => {
   const { user } = useAuth();
   const userRole = useUserRole();
-  const { profile } = useProfile();
+  const { profile, isLoading: profileLoading } = useProfile();
   const navigate = useNavigate();
+
+  // Debug logging
+  React.useEffect(() => {
+    console.log('🎭 UserDropdown - Profile data:', profile);
+    console.log('🖼️ UserDropdown - Avatar URL:', profile?.avatar_url);
+    console.log('👤 UserDropdown - User:', user?.email);
+    console.log('⏳ UserDropdown - Profile loading:', profileLoading);
+  }, [profile, user, profileLoading]);
 
   const handleSignOut = () => {
     onSignOut();
     navigate('/');
   };
 
-  // Show loading state while determining user role
-  if (userRole === 'loading') {
+  // Show loading state while determining user role or loading profile
+  if (userRole === 'loading' || profileLoading) {
     return (
       <Button variant="ghost" className="relative h-10 w-10 rounded-full">
         <SmartAvatar
@@ -43,7 +51,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ onSignOut }) => {
     );
   }
 
-  const displayName = profile?.business_name || profile?.full_name || 'User';
+  const displayName = profile?.business_name || profile?.full_name || user?.email || 'User';
 
   return (
     <DropdownMenu>
@@ -66,6 +74,11 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ onSignOut }) => {
             <p className="text-xs leading-none text-muted-foreground">
               {user?.email}
             </p>
+            {profile?.avatar_url && (
+              <p className="text-xs leading-none text-muted-foreground opacity-60">
+                Avatar: {profile.avatar_url.slice(-20)}...
+              </p>
+            )}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
