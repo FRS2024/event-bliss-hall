@@ -50,7 +50,7 @@ const App = () => (
             <Route path="/dashboard/venues/:id/edit" element={<EditVenuePage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/my-bookings" element={<MyBookingsPage />} />
-            <Route path="/messages" element={<MessagesPage />} />
+            <Route path="/messages/*" element={<MessagesPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

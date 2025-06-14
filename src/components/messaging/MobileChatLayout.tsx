@@ -2,7 +2,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MobileChatHeader from './MobileChatHeader';
-import StoriesSection from './StoriesSection';
 import MobileChatList from './MobileChatList';
 import MessageThread from './MessageThread';
 
@@ -13,7 +12,6 @@ const MobileChatLayout: React.FC = () => {
         <Route index element={
           <>
             <MobileChatHeader />
-            <StoriesSection />
             <div className="flex-1 overflow-y-auto">
               <MobileChatList />
             </div>

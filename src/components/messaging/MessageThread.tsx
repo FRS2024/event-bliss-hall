@@ -1,6 +1,5 @@
-
 import React, { useState, useRef, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -14,10 +13,19 @@ import SmartAvatar from '@/components/ui/smart-avatar';
 const MessageThread: React.FC = () => {
   const { conversationId } = useParams<{ conversationId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Determine the correct back navigation path based on current location
+  const getBackPath = () => {
+    if (location.pathname.includes('/dashboard/messages')) {
+      return '/dashboard/messages';
+    }
+    return '/messages';
+  };
 
   const { data: conversation } = useQuery({
     queryKey: ['conversation', conversationId],
@@ -125,16 +133,16 @@ const MessageThread: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
+      {/* Mobile-optimized Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
         <div className="flex items-center space-x-3">
           <Button 
             variant="ghost" 
             size="sm"
-            onClick={() => navigate('/dashboard/messages')}
-            className="lg:hidden"
+            onClick={() => navigate(getBackPath())}
+            className="p-2"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           
           <SmartAvatar
@@ -144,19 +152,20 @@ const MessageThread: React.FC = () => {
             size="md"
           />
           
-          <div>
-            <h2 className="font-semibold text-gray-900 dark:text-white">{displayName}</h2>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-semibold text-gray-900 dark:text-white truncate">{displayName}</h2>
             <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-              <MapPin className="h-3 w-3 mr-1" />
-              <span>{conversation.venues?.name} • {conversation.venues?.city}</span>
+              <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+              <span className="truncate">{conversation.venues?.name} • {conversation.venues?.city}</span>
             </div>
           </div>
         </div>
 
         {conversation.bookings && (
-          <div className="flex items-center text-sm text-blue-600 dark:text-blue-400">
+          <div className="flex items-center text-sm text-blue-600 dark:text-blue-400 ml-2 flex-shrink-0">
             <Calendar className="h-4 w-4 mr-1" />
-            <span>Booking: {new Date(conversation.bookings.event_date).toLocaleDateString()}</span>
+            <span className="hidden sm:inline">Booking: </span>
+            <span>{new Date(conversation.bookings.event_date).toLocaleDateString()}</span>
           </div>
         )}
       </div>
@@ -205,7 +214,7 @@ const MessageThread: React.FC = () => {
         </div>
       </div>
 
-      {/* Message Input */}
+      {/* Mobile-optimized Message Input */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
         <div className="flex items-end space-x-2 max-w-4xl mx-auto">
           <Textarea
@@ -223,7 +232,7 @@ const MessageThread: React.FC = () => {
           <Button 
             onClick={handleSendMessage}
             disabled={!newMessage.trim() || sendMessageMutation.isPending}
-            className="rounded-full h-11 w-11 p-0"
+            className="rounded-full h-11 w-11 p-0 flex-shrink-0"
           >
             <Send className="h-4 w-4" />
           </Button>
