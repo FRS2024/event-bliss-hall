@@ -1,6 +1,6 @@
 
 import React from 'react';
-import Header from './Header';
+import EnhancedHeader from './EnhancedHeader';
 import Footer from './Footer';
 
 interface MainLayoutProps {
@@ -9,9 +9,9 @@ interface MainLayoutProps {
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-grow">
+    <div className="flex flex-col min-h-screen bg-gray-50/30 dark:bg-gray-900">
+      <EnhancedHeader />
+      <main className="flex-grow pt-16 lg:pt-20">
         {children}
       </main>
       <Footer />

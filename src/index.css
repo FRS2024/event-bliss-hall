@@ -5,6 +5,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import enhanced UI styles */
+@import './styles/enhanced-ui.css';
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -69,6 +72,38 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Enhanced scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-500;
+}
+
+/* Selection styling */
+::selection {
+  @apply bg-blush-200 text-blush-900;
+}
+
+/* Focus styles */
+:focus-visible {
+  @apply outline-none ring-2 ring-blush-500/30 ring-offset-2;
 }
 
 /* Custom Fonts */
