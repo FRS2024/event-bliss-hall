@@ -8,21 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { VENUE_CATEGORIES, EVENT_TYPES } from '@/constants/venue';
-
-interface VenueFormData {
-  name: string;
-  description: string;
-  capacity: number;
-  city: string;
-  address: string;
-  category: string;
-  eventTypes: string[];
-  pricePerHour?: number;
-  pricePerDay?: number;
-  pricePerEvent?: number;
-  latitude?: number;
-  longitude?: number;
-}
+import { VenueFormData } from '@/types/venue-form';
 
 interface BasicInformationSectionProps {
   register: UseFormRegister<VenueFormData>;

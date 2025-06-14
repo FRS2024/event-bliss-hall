@@ -12,21 +12,7 @@ import LocationSection from './venue-form/LocationSection';
 import PricingSection from './venue-form/PricingSection';
 import FeaturesSection from './venue-form/FeaturesSection';
 import EditImagesSection from './venue-form/EditImagesSection';
-
-interface VenueFormData {
-  name: string;
-  description: string;
-  capacity: number;
-  city: string;
-  address: string;
-  category: string;
-  eventTypes: string[];
-  pricePerHour?: number;
-  pricePerDay?: number;
-  pricePerEvent?: number;
-  latitude?: number;
-  longitude?: number;
-}
+import { VenueFormData } from '@/types/venue-form';
 
 const EditVenueForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
