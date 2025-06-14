@@ -2,7 +2,7 @@
 export const ALGERIA_CITIES = [
   'Algiers', 'Oran', 'Constantine', 'Batna', 'Djelfa', 'Setif', 'Annaba', 'Sidi Bel Abbes',
   'Biskra', 'Tebessa', 'El Oued', 'Skikda', 'Tiaret', 'Bejaia', 'Tlemcen', 'Ouargla',
-  'Blida', 'Bouira', 'Tarf', 'Tindouf', 'Tissemsilt', 'El Bayadh', 'Khenchela', 'Mila',
+  'Blida', 'Bouira', 'Guelma', 'Tindouf', 'Tissemsilt', 'El Bayadh', 'Khenchela', 'Mila',
   'Ain Defla', 'Naama', 'Ain Temouchent', 'Ghardaia', 'Relizane', 'Tizi Ouzou', 'Mascara',
   'Ouled Djellal', 'Bordj Bou Arreridj', 'Boumerdes', 'El Tarf', 'Jijel', 'Laghouat',
   'Oum El Bouaghi', 'Saida', 'Souk Ahras', 'Tipaza', 'Medea', 'Mostaganem', 'MSila',
