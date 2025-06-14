@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import ScrollLink from '@/components/ui/ScrollLink';
 
 const Footer: React.FC = () => {
   return (
@@ -20,24 +21,24 @@ const Footer: React.FC = () => {
             <h4 className="font-medium text-lg mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/venues" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
+                <ScrollLink to="/venues" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
                   All Venues
-                </Link>
+                </ScrollLink>
               </li>
               <li>
-                <Link to="/categories" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
+                <ScrollLink to="/categories" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
                   Categories
-                </Link>
+                </ScrollLink>
               </li>
               <li>
-                <Link to="/how-it-works" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
+                <ScrollLink to="/how-it-works" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
                   How It Works
-                </Link>
+                </ScrollLink>
               </li>
               <li>
-                <Link to="/contact" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
+                <ScrollLink to="/contact" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
                   Contact Us
-                </Link>
+                </ScrollLink>
               </li>
             </ul>
           </div>
@@ -46,24 +47,24 @@ const Footer: React.FC = () => {
             <h4 className="font-medium text-lg mb-4">Event Types</h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/categories/wedding" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
+                <ScrollLink to="/categories/wedding" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
                   Weddings
-                </Link>
+                </ScrollLink>
               </li>
               <li>
-                <Link to="/categories/birthday" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
+                <ScrollLink to="/categories/birthday" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
                   Birthdays
-                </Link>
+                </ScrollLink>
               </li>
               <li>
-                <Link to="/categories/corporate" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
+                <ScrollLink to="/categories/corporate" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
                   Corporate Events
-                </Link>
+                </ScrollLink>
               </li>
               <li>
-                <Link to="/categories/other" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
+                <ScrollLink to="/categories/other" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
                   Special Occasions
-                </Link>
+                </ScrollLink>
               </li>
             </ul>
           </div>
@@ -72,19 +73,19 @@ const Footer: React.FC = () => {
             <h4 className="font-medium text-lg mb-4">Legal</h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/terms" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
+                <ScrollLink to="/terms" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
                   Terms of Service
-                </Link>
+                </ScrollLink>
               </li>
               <li>
-                <Link to="/privacy" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
+                <ScrollLink to="/privacy" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
                   Privacy Policy
-                </Link>
+                </ScrollLink>
               </li>
               <li>
-                <Link to="/cookies" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
+                <ScrollLink to="/cookies" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
                   Cookie Policy
-                </Link>
+                </ScrollLink>
               </li>
             </ul>
           </div>
