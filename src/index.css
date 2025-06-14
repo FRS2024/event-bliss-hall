@@ -129,3 +129,52 @@
     @apply inline-block px-3 py-1 text-xs font-medium rounded-full bg-champagne-100 text-champagne-800 dark:bg-champagne-900 dark:text-champagne-100;
   }
 }
+
+@layer utilities {
+  /* Enhanced hover effects for category cards */
+  .category-card-hover {
+    @apply transition-all duration-500 hover:scale-105 hover:-translate-y-2 hover:shadow-2xl;
+  }
+  
+  /* Gradient background animations */
+  .gradient-shift {
+    @apply transition-all duration-500;
+    background-size: 200% 200%;
+  }
+  
+  .gradient-shift:hover {
+    background-position: 100% 100%;
+  }
+}
+
+/* Custom animations for enhanced interactivity */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(255, 92, 124, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(255, 92, 124, 0.6); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .venue-card {
+    transition: none;
+  }
+  
+  .animate-float,
+  .animate-glow,
+  .animate-pulse-soft {
+    animation: none;
+  }
+}
