@@ -4,12 +4,15 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { MessageCircle, Calendar, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 const MessagesList: React.FC = () => {
   const { user } = useAuth();
+  const userRole = useUserRole();
 
   const { data: conversations, isLoading } = useQuery({
     queryKey: ['conversations', user?.id],
@@ -38,7 +41,7 @@ const MessagesList: React.FC = () => {
     enabled: !!user,
   });
 
-  if (isLoading) {
+  if (isLoading || userRole === 'loading') {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-lg">Loading conversations...</div>
@@ -47,12 +50,24 @@ const MessagesList: React.FC = () => {
   }
 
   if (!conversations || conversations.length === 0) {
+    const isHost = userRole === 'host';
+    
     return (
       <Card>
         <CardContent className="text-center py-8">
           <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">No conversations yet</h3>
-          <p className="text-gray-600">Messages will appear here when guests contact you about your venues</p>
+          <p className="text-gray-600 mb-4">
+            {isHost 
+              ? "Messages will appear here when guests contact you about your venues"
+              : "Messages will appear here when you contact hosts about venues"
+            }
+          </p>
+          {!isHost && (
+            <Button asChild variant="outline">
+              <Link to="/venues">Browse Venues</Link>
+            </Button>
+          )}
         </CardContent>
       </Card>
     );
