@@ -128,6 +128,15 @@
   .category-tag {
     @apply inline-block px-3 py-1 text-xs font-medium rounded-full bg-champagne-100 text-champagne-800 dark:bg-champagne-900 dark:text-champagne-100;
   }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @layer utilities {
