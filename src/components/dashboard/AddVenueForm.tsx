@@ -23,6 +23,24 @@ const ALGERIA_CITIES = [
   'Chlef', 'Adrar', 'Illizi', 'Tamanghasset'
 ];
 
+const VENUE_CATEGORIES = [
+  'Wedding Hall',
+  'Conference Room',
+  'Restaurant & Café',
+  'Outdoor Garden',
+  'Event Center',
+  'Hotel & Resort',
+  'Cultural Center',
+  'Sports Facility',
+  'Private Villa',
+  'Rooftop & Terrace',
+  'Banquet Hall',
+  'Community Center',
+  'Art Gallery',
+  'Theater',
+  'Beach Club'
+];
+
 const VENUE_FEATURES = [
   'Air Conditioning', 'Wi-Fi', 'Parking', 'Catering Kitchen', 'Sound System', 
   'Projector/Screen', 'Stage/Platform', 'Dance Floor', 'Bar Area', 'Outdoor Space',
@@ -36,6 +54,7 @@ interface VenueFormData {
   capacity: number;
   city: string;
   address: string;
+  category: string;
   pricePerHour?: number;
   pricePerDay?: number;
   pricePerEvent?: number;
@@ -51,10 +70,12 @@ const AddVenueForm: React.FC = () => {
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<VenueFormData>();
 
   const selectedCity = watch('city');
+  const selectedCategory = watch('category');
 
-  // Ensure the city field is properly registered
+  // Ensure the city and category fields are properly registered
   React.useEffect(() => {
     register('city', { required: 'City is required' });
+    register('category', { required: 'Category is required' });
   }, [register]);
 
   // Check authentication on component mount
@@ -100,6 +121,11 @@ const AddVenueForm: React.FC = () => {
       return;
     }
 
+    if (!data.category) {
+      toast.error('Please select a category');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       console.log('Creating venue for user:', user.id);
@@ -113,6 +139,7 @@ const AddVenueForm: React.FC = () => {
           capacity: Number(data.capacity),
           city: data.city,
           address: data.address,
+          category: data.category,
           host_id: user.id,
           price_per_hour: data.pricePerHour ? Number(data.pricePerHour) : null,
           price_per_day: data.pricePerDay ? Number(data.pricePerDay) : null,
@@ -224,6 +251,23 @@ const AddVenueForm: React.FC = () => {
                 placeholder="Enter venue name"
               />
               {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+            </div>
+
+            <div>
+              <Label htmlFor="category">Category *</Label>
+              <Select onValueChange={(value) => setValue('category', value)} value={selectedCategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select venue category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {VENUE_CATEGORIES.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.category && <p className="text-red-500 text-sm">{errors.category.message}</p>}
             </div>
 
             <div>

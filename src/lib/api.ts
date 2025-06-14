@@ -335,7 +335,7 @@ const mapVenuesToInterface = (rawVenues: any[]): Venue[] => {
       price_per_day: venue.price_per_day,
       price_per_event: venue.price_per_event,
       capacity: venue.capacity,
-      category: 'Event Space', // Default category since it's not in the database
+      category: venue.category || 'Event Space', // Use the actual category from database
       images: images.length > 0 ? images : [primaryImage || '/placeholder.svg'],
       amenities,
       rating: 4.5, // Default rating since reviews aren't implemented
@@ -346,3 +346,5 @@ const mapVenuesToInterface = (rawVenues: any[]): Venue[] => {
     } as Venue;
   });
 };
+
+export { mapVenuesToInterface };

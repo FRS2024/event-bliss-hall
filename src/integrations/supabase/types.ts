@@ -245,6 +245,7 @@ export type Database = {
         Row: {
           address: string
           capacity: number
+          category: string
           city: string
           created_at: string
           description: string
@@ -262,6 +263,7 @@ export type Database = {
         Insert: {
           address: string
           capacity: number
+          category: string
           city: string
           created_at?: string
           description: string
@@ -279,6 +281,7 @@ export type Database = {
         Update: {
           address?: string
           capacity?: number
+          category?: string
           city?: string
           created_at?: string
           description?: string
