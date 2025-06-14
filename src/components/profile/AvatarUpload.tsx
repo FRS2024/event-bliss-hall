@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,8 +22,13 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
   onAvatarUpdate
 }) => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentAvatarUrl);
+
+  React.useEffect(() => {
+    setPreviewUrl(currentAvatarUrl);
+  }, [currentAvatarUrl]);
 
   const uploadAvatar = async (file: File) => {
     if (!user) {
@@ -33,6 +39,8 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
     setUploading(true);
     
     try {
+      console.log('Starting avatar upload for user:', user.id);
+      
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}.${fileExt}`;
       const filePath = `${user.id}/${fileName}`;
@@ -41,6 +49,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
       if (currentAvatarUrl) {
         const oldPath = currentAvatarUrl.split('/').pop();
         if (oldPath) {
+          console.log('Deleting old avatar:', `${user.id}/${oldPath}`);
           await supabase.storage
             .from('avatars')
             .remove([`${user.id}/${oldPath}`]);
@@ -48,31 +57,47 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
       }
 
       // Upload new avatar
+      console.log('Uploading new avatar to:', filePath);
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file, { upsert: true });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
 
+      console.log('Avatar uploaded, public URL:', publicUrl);
+
       // Update profile with new avatar URL
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ avatar_url: publicUrl })
+        .update({ 
+          avatar_url: publicUrl,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', user.id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Profile update error:', updateError);
+        throw updateError;
+      }
 
       setPreviewUrl(publicUrl);
       onAvatarUpdate(publicUrl);
+      
+      // Invalidate profile queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+      
       toast.success('Avatar updated successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading avatar:', error);
-      toast.error('Failed to upload avatar');
+      toast.error(`Failed to upload avatar: ${error.message}`);
     } finally {
       setUploading(false);
     }
@@ -84,9 +109,12 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
     setUploading(true);
     
     try {
+      console.log('Removing avatar for user:', user.id);
+      
       // Delete from storage
       const fileName = currentAvatarUrl.split('/').pop();
       if (fileName) {
+        console.log('Deleting avatar file:', `${user.id}/${fileName}`);
         await supabase.storage
           .from('avatars')
           .remove([`${user.id}/${fileName}`]);
@@ -95,17 +123,27 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
       // Update profile
       const { error } = await supabase
         .from('profiles')
-        .update({ avatar_url: null })
+        .update({ 
+          avatar_url: null,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Profile update error:', error);
+        throw error;
+      }
 
       setPreviewUrl(null);
       onAvatarUpdate(null);
+      
+      // Invalidate profile queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+      
       toast.success('Avatar removed successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error removing avatar:', error);
-      toast.error('Failed to remove avatar');
+      toast.error(`Failed to remove avatar: ${error.message}`);
     } finally {
       setUploading(false);
     }
@@ -114,6 +152,8 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    console.log('File selected:', file.name, file.size, file.type);
 
     // Validate file type
     if (!file.type.startsWith('image/')) {

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,10 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AvatarUpload from '@/components/profile/AvatarUpload';
 import { useProfile } from '@/hooks/useProfile';
+import { toast } from 'sonner';
 
 const DashboardSettings: React.FC = () => {
   const { user } = useAuth();
-  const { profile, isLoading: profileLoading, updateProfile, isUpdating } = useProfile();
+  const { profile, isLoading: profileLoading, updateProfile, isUpdating, error } = useProfile();
   const [formData, setFormData] = useState({
     full_name: '',
     business_name: '',
@@ -19,8 +20,9 @@ const DashboardSettings: React.FC = () => {
     bio: '',
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (profile) {
+      console.log('Setting form data from profile:', profile);
       setFormData({
         full_name: profile.full_name || '',
         business_name: profile.business_name || '',
@@ -38,19 +40,40 @@ const DashboardSettings: React.FC = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-lg text-red-600">Error loading profile: {error.message}</div>
+      </div>
+    );
+  }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    console.log('Form input changed:', name, value);
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
-  const handleSave = () => {
-    updateProfile(formData);
+  const handleSave = async () => {
+    console.log('Saving profile changes:', formData);
+    
+    if (!formData.full_name.trim()) {
+      toast.error('Full name is required');
+      return;
+    }
+
+    try {
+      await updateProfile(formData);
+    } catch (error) {
+      console.error('Failed to save profile:', error);
+    }
   };
 
   const handleAvatarUpdate = (url: string | null) => {
+    console.log('Avatar updated:', url);
     // Avatar update is handled in the AvatarUpload component
   };
 
@@ -85,13 +108,14 @@ const DashboardSettings: React.FC = () => {
           </div>
           
           <div>
-            <Label htmlFor="full_name">Full Name</Label>
+            <Label htmlFor="full_name">Full Name *</Label>
             <Input 
               id="full_name" 
               name="full_name"
               placeholder="Your full name"
               value={formData.full_name}
               onChange={handleInputChange}
+              required
             />
           </div>
           
