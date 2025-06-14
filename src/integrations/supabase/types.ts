@@ -249,6 +249,7 @@ export type Database = {
           city: string
           created_at: string
           description: string
+          event_types: string[] | null
           host_id: string
           id: string
           is_active: boolean | null
@@ -267,6 +268,7 @@ export type Database = {
           city: string
           created_at?: string
           description: string
+          event_types?: string[] | null
           host_id: string
           id?: string
           is_active?: boolean | null
@@ -285,6 +287,7 @@ export type Database = {
           city?: string
           created_at?: string
           description?: string
+          event_types?: string[] | null
           host_id?: string
           id?: string
           is_active?: boolean | null

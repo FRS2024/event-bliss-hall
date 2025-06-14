@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { VENUE_CATEGORIES } from '@/constants/venue';
+import { Checkbox } from '@/components/ui/checkbox';
+import { VENUE_CATEGORIES, EVENT_TYPES } from '@/constants/venue';
 
 interface VenueFormData {
   name: string;
@@ -15,6 +16,7 @@ interface VenueFormData {
   city: string;
   address: string;
   category: string;
+  eventTypes: string[];
   pricePerHour?: number;
   pricePerDay?: number;
   pricePerEvent?: number;
@@ -34,6 +36,15 @@ const BasicInformationSection: React.FC<BasicInformationSectionProps> = ({
   watch
 }) => {
   const selectedCategory = watch('category');
+  const selectedEventTypes = watch('eventTypes') || [];
+
+  const handleEventTypeChange = (eventType: string, checked: boolean) => {
+    if (checked) {
+      setValue('eventTypes', [...selectedEventTypes, eventType]);
+    } else {
+      setValue('eventTypes', selectedEventTypes.filter(type => type !== eventType));
+    }
+  };
 
   return (
     <Card>
@@ -66,6 +77,25 @@ const BasicInformationSection: React.FC<BasicInformationSectionProps> = ({
             </SelectContent>
           </Select>
           {errors.category && <p className="text-red-500 text-sm">{errors.category.message}</p>}
+        </div>
+
+        <div>
+          <Label>Event Types *</Label>
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            {EVENT_TYPES.map((eventType) => (
+              <div key={eventType} className="flex items-center space-x-2">
+                <Checkbox
+                  id={eventType}
+                  checked={selectedEventTypes.includes(eventType)}
+                  onCheckedChange={(checked) => handleEventTypeChange(eventType, !!checked)}
+                />
+                <Label htmlFor={eventType} className="text-sm font-normal">
+                  {eventType}
+                </Label>
+              </div>
+            ))}
+          </div>
+          {errors.eventTypes && <p className="text-red-500 text-sm">{errors.eventTypes.message}</p>}
         </div>
 
         <div>

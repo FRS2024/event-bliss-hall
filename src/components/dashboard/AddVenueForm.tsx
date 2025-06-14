@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +19,7 @@ interface VenueFormData {
   city: string;
   address: string;
   category: string;
+  eventTypes: string[];
   pricePerHour?: number;
   pricePerDay?: number;
   pricePerEvent?: number;
@@ -32,12 +34,17 @@ const AddVenueForm: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<VenueFormData>();
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<VenueFormData>({
+    defaultValues: {
+      eventTypes: []
+    }
+  });
 
   // Ensure the required fields are properly registered
   React.useEffect(() => {
     register('city', { required: 'City is required' });
     register('category', { required: 'Category is required' });
+    register('eventTypes', { required: 'Please select at least one event type' });
     register('latitude');
     register('longitude');
   }, [register]);
@@ -90,11 +97,16 @@ const AddVenueForm: React.FC = () => {
       return;
     }
 
+    if (!data.eventTypes || data.eventTypes.length === 0) {
+      toast.error('Please select at least one event type');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       console.log('Creating venue for user:', user.id);
 
-      // Create venue with coordinates
+      // Create venue with coordinates and event types
       const { data: venue, error: venueError } = await supabase
         .from('venues')
         .insert({
@@ -104,6 +116,7 @@ const AddVenueForm: React.FC = () => {
           city: data.city,
           address: data.address,
           category: data.category,
+          event_types: data.eventTypes,
           host_id: user.id,
           price_per_hour: data.pricePerHour ? Number(data.pricePerHour) : null,
           price_per_day: data.pricePerDay ? Number(data.pricePerDay) : null,
@@ -174,7 +187,7 @@ const AddVenueForm: React.FC = () => {
         }
       }
 
-      toast.success('Venue created successfully with location data!');
+      toast.success('Venue created successfully with event types and location data!');
       navigate('/dashboard');
     } catch (error: any) {
       console.error('Error creating venue:', error);
@@ -199,7 +212,7 @@ const AddVenueForm: React.FC = () => {
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Add New Venue</h1>
-        <p className="text-gray-600 dark:text-gray-400">Create a new venue listing with precise location</p>
+        <p className="text-gray-600 dark:text-gray-400">Create a new venue listing with precise location and event types</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">

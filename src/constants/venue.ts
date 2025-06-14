@@ -27,6 +27,16 @@ export const VENUE_CATEGORIES = [
   'Beach Club'
 ];
 
+export const EVENT_TYPES = [
+  'Wedding',
+  'Birthday',
+  'Corporate',
+  'Reception',
+  'Party',
+  'Conference',
+  'Other'
+];
+
 export const VENUE_FEATURES = [
   'Air Conditioning', 'Wi-Fi', 'Parking', 'Catering Kitchen', 'Sound System', 
   'Projector/Screen', 'Stage/Platform', 'Dance Floor', 'Bar Area', 'Outdoor Space',
