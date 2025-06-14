@@ -5,18 +5,40 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
+import { Textarea } from '@/components/ui/textarea';
+import AvatarUpload from '@/components/profile/AvatarUpload';
+import { useProfile } from '@/hooks/useProfile';
 
 const DashboardSettings: React.FC = () => {
   const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
+  const { profile, isLoading: profileLoading, updateProfile, isUpdating } = useProfile();
   const [formData, setFormData] = useState({
-    businessName: user?.user_metadata?.business_name || '',
-    contactPhone: user?.user_metadata?.contact_phone || '',
-    description: user?.user_metadata?.description || '',
+    full_name: '',
+    business_name: '',
+    phone: '',
+    bio: '',
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  React.useEffect(() => {
+    if (profile) {
+      setFormData({
+        full_name: profile.full_name || '',
+        business_name: profile.business_name || '',
+        phone: profile.phone || '',
+        bio: profile.bio || '',
+      });
+    }
+  }, [profile]);
+
+  if (profileLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-lg">Loading profile...</div>
+      </div>
+    );
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -24,19 +46,12 @@ const DashboardSettings: React.FC = () => {
     }));
   };
 
-  const handleSave = async () => {
-    setIsLoading(true);
-    try {
-      // Here you would typically update the user metadata in Supabase
-      // For now, we'll just show a success message
-      console.log('Saving settings:', formData);
-      toast.success('Settings saved successfully!');
-    } catch (error) {
-      console.error('Error saving settings:', error);
-      toast.error('Failed to save settings');
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSave = () => {
+    updateProfile(formData);
+  };
+
+  const handleAvatarUpdate = (url: string | null) => {
+    // Avatar update is handled in the AvatarUpload component
   };
 
   return (
@@ -45,6 +60,19 @@ const DashboardSettings: React.FC = () => {
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
         <p className="text-gray-600 dark:text-gray-400">Manage your account and business preferences</p>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Profile Picture</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AvatarUpload
+            currentAvatarUrl={profile?.avatar_url}
+            userName={profile?.business_name || profile?.full_name || user?.email || ''}
+            onAvatarUpdate={handleAvatarUpdate}
+          />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -57,40 +85,52 @@ const DashboardSettings: React.FC = () => {
           </div>
           
           <div>
-            <Label htmlFor="businessName">Business Name</Label>
+            <Label htmlFor="full_name">Full Name</Label>
             <Input 
-              id="businessName" 
-              name="businessName"
+              id="full_name" 
+              name="full_name"
+              placeholder="Your full name"
+              value={formData.full_name}
+              onChange={handleInputChange}
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="business_name">Business Name</Label>
+            <Input 
+              id="business_name" 
+              name="business_name"
               placeholder="Your business name" 
-              value={formData.businessName}
+              value={formData.business_name}
               onChange={handleInputChange}
             />
           </div>
           
           <div>
-            <Label htmlFor="contactPhone">Contact Phone</Label>
+            <Label htmlFor="phone">Contact Phone</Label>
             <Input 
-              id="contactPhone" 
-              name="contactPhone"
+              id="phone" 
+              name="phone"
               placeholder="Your phone number" 
-              value={formData.contactPhone}
+              value={formData.phone}
               onChange={handleInputChange}
             />
           </div>
           
           <div>
-            <Label htmlFor="description">Business Description</Label>
-            <Input 
-              id="description" 
-              name="description"
+            <Label htmlFor="bio">Business Description</Label>
+            <Textarea 
+              id="bio" 
+              name="bio"
               placeholder="Describe your business" 
-              value={formData.description}
+              value={formData.bio}
               onChange={handleInputChange}
+              rows={3}
             />
           </div>
           
-          <Button onClick={handleSave} disabled={isLoading}>
-            {isLoading ? 'Saving...' : 'Save Changes'}
+          <Button onClick={handleSave} disabled={isUpdating}>
+            {isUpdating ? 'Saving...' : 'Save Changes'}
           </Button>
         </CardContent>
       </Card>

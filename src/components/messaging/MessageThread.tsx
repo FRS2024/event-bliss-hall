@@ -5,11 +5,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ArrowLeft, Send, MapPin, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
+import SmartAvatar from '@/components/ui/smart-avatar';
 
 const MessageThread: React.FC = () => {
   const { conversationId } = useParams<{ conversationId: string }>();
@@ -35,7 +35,18 @@ const MessageThread: React.FC = () => {
         .single();
 
       if (error) throw error;
-      return data;
+
+      // Fetch profiles for host and guest
+      const [hostProfile, guestProfile] = await Promise.all([
+        supabase.from('profiles').select('*').eq('id', data.host_id).single(),
+        supabase.from('profiles').select('*').eq('id', data.guest_id).single()
+      ]);
+
+      return {
+        ...data,
+        hostProfile: hostProfile.data,
+        guestProfile: guestProfile.data
+      };
     },
     enabled: !!conversationId,
   });
@@ -106,7 +117,11 @@ const MessageThread: React.FC = () => {
   }
 
   const isHost = conversation.host_id === user?.id;
-  const otherPartyName = isHost ? 'Guest' : 'Host';
+  const otherUserProfile = isHost ? conversation.guestProfile : conversation.hostProfile;
+  const currentUserProfile = isHost ? conversation.hostProfile : conversation.guestProfile;
+  const displayName = isHost 
+    ? (otherUserProfile?.full_name || 'Guest')
+    : (otherUserProfile?.business_name || otherUserProfile?.full_name || 'Host');
 
   return (
     <div className="flex flex-col h-full">
@@ -122,17 +137,15 @@ const MessageThread: React.FC = () => {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           
-          <Avatar className="h-10 w-10">
-            <AvatarFallback className={`
-              text-white font-semibold
-              ${isHost ? 'bg-green-500' : 'bg-blue-500'}
-            `}>
-              {isHost ? 'G' : 'H'}
-            </AvatarFallback>
-          </Avatar>
+          <SmartAvatar
+            src={otherUserProfile?.avatar_url}
+            alt={displayName}
+            fallbackText={displayName}
+            size="md"
+          />
           
           <div>
-            <h2 className="font-semibold text-gray-900 dark:text-white">{otherPartyName}</h2>
+            <h2 className="font-semibold text-gray-900 dark:text-white">{displayName}</h2>
             <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
               <MapPin className="h-3 w-3 mr-1" />
               <span>{conversation.venues?.name} • {conversation.venues?.city}</span>
@@ -153,23 +166,24 @@ const MessageThread: React.FC = () => {
         <div className="space-y-4 max-w-4xl mx-auto">
           {messages?.map((message) => {
             const isOwn = message.sender_id === user?.id;
+            const senderProfile = isOwn ? currentUserProfile : otherUserProfile;
+            const senderName = isOwn 
+              ? (isHost ? (currentUserProfile?.business_name || currentUserProfile?.full_name) : currentUserProfile?.full_name)
+              : displayName;
+
             return (
               <div
                 key={message.id}
                 className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
               >
                 <div className={`flex items-end space-x-2 max-w-xs lg:max-w-md ${isOwn ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                  <Avatar className="h-8 w-8 flex-shrink-0">
-                    <AvatarFallback className={`
-                      text-white text-sm font-medium
-                      ${isOwn 
-                        ? (isHost ? 'bg-green-500' : 'bg-blue-500')
-                        : (isHost ? 'bg-blue-500' : 'bg-green-500')
-                      }
-                    `}>
-                      {isOwn ? (isHost ? 'H' : 'G') : (isHost ? 'G' : 'H')}
-                    </AvatarFallback>
-                  </Avatar>
+                  <SmartAvatar
+                    src={senderProfile?.avatar_url}
+                    alt={senderName || ''}
+                    fallbackText={senderName || ''}
+                    size="sm"
+                    className="flex-shrink-0"
+                  />
                   
                   <div className={`
                     px-4 py-2 rounded-2xl shadow-sm

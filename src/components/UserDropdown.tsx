@@ -10,10 +10,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useProfile } from '@/hooks/useProfile';
+import SmartAvatar from '@/components/ui/smart-avatar';
 
 interface UserDropdownProps {
   onSignOut: () => void;
@@ -22,6 +23,7 @@ interface UserDropdownProps {
 const UserDropdown: React.FC<UserDropdownProps> = ({ onSignOut }) => {
   const { user } = useAuth();
   const userRole = useUserRole();
+  const { profile } = useProfile();
   const navigate = useNavigate();
 
   const handleSignOut = () => {
@@ -29,45 +31,37 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ onSignOut }) => {
     navigate('/');
   };
 
-  const getInitials = (email: string) => {
-    return email.slice(0, 2).toUpperCase();
-  };
-
-  const getUserAvatar = () => {
-    // If user has a Google avatar, it would be in user.user_metadata.avatar_url
-    return user?.user_metadata?.avatar_url || null;
-  };
-
   // Show loading state while determining user role
   if (userRole === 'loading') {
     return (
       <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-        <Avatar className="h-10 w-10">
-          <AvatarFallback className="bg-blush-100 text-blush-600 dark:bg-blush-900 dark:text-blush-300">
-            {user?.email ? getInitials(user.email) : <UserIcon size={16} />}
-          </AvatarFallback>
-        </Avatar>
+        <SmartAvatar
+          fallbackText={user?.email || ''}
+          size="md"
+        />
       </Button>
     );
   }
+
+  const displayName = profile?.business_name || profile?.full_name || 'User';
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={getUserAvatar()} alt={user?.email} />
-            <AvatarFallback className="bg-blush-100 text-blush-600 dark:bg-blush-900 dark:text-blush-300">
-              {user?.email ? getInitials(user.email) : <UserIcon size={16} />}
-            </AvatarFallback>
-          </Avatar>
+          <SmartAvatar
+            src={profile?.avatar_url}
+            alt={displayName}
+            fallbackText={displayName}
+            size="md"
+          />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              {user?.user_metadata?.full_name || 'User'}
+              {displayName}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
               {user?.email}

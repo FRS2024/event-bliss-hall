@@ -2,13 +2,13 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Search, MessageCircle } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
+import SmartAvatar from '@/components/ui/smart-avatar';
 
 const ChatSidebar: React.FC = () => {
   const { user } = useAuth();
@@ -36,14 +36,30 @@ const ChatSidebar: React.FC = () => {
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+
+      // Fetch profiles for each conversation
+      const conversationsWithProfiles = await Promise.all(
+        data.map(async (conversation) => {
+          const isHost = conversation.host_id === user.id;
+          const otherUserId = isHost ? conversation.guest_id : conversation.host_id;
+          
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', otherUserId)
+            .single();
+
+          return {
+            ...conversation,
+            otherUserProfile: profile
+          };
+        })
+      );
+
+      return conversationsWithProfiles;
     },
     enabled: !!user,
   });
-
-  const getInitials = (isHost: boolean) => {
-    return isHost ? 'H' : 'G';
-  };
 
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -110,7 +126,10 @@ const ChatSidebar: React.FC = () => {
               ).length || 0;
               
               const isHost = conversation.host_id === user?.id;
-              const otherPartyName = isHost ? 'Guest' : 'Host';
+              const otherUserProfile = conversation.otherUserProfile;
+              const displayName = isHost 
+                ? (otherUserProfile?.full_name || 'Guest')
+                : (otherUserProfile?.business_name || otherUserProfile?.full_name || 'Host');
               const isActive = conversationId === conversation.id;
 
               return (
@@ -124,20 +143,19 @@ const ChatSidebar: React.FC = () => {
                     ${isActive ? 'bg-blue-50 dark:bg-blue-900/20 border-r-2 border-blue-500' : ''}
                   `}>
                     {/* Avatar */}
-                    <Avatar className="h-12 w-12 mr-3 flex-shrink-0">
-                      <AvatarFallback className={`
-                        text-white font-semibold text-sm
-                        ${isHost ? 'bg-green-500' : 'bg-blue-500'}
-                      `}>
-                        {getInitials(!isHost)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <SmartAvatar
+                      src={otherUserProfile?.avatar_url}
+                      alt={displayName}
+                      fallbackText={displayName}
+                      size="lg"
+                      className="mr-3 flex-shrink-0"
+                    />
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <h3 className={`font-medium text-gray-900 dark:text-white text-sm ${unreadCount > 0 ? 'font-semibold' : ''}`}>
-                          {otherPartyName}
+                          {displayName}
                         </h3>
                         <div className="flex items-center space-x-2">
                           {unreadCount > 0 && (
