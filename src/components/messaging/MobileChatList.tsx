@@ -7,11 +7,13 @@ import { MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useTranslation } from 'react-i18next';
 import SmartAvatar from '@/components/ui/smart-avatar';
 
 const MobileChatList: React.FC = () => {
   const { user } = useAuth();
   const userRole = useUserRole();
+  const { t } = useTranslation();
 
   const { data: conversations, isLoading } = useQuery({
     queryKey: ['conversations', user?.id],
@@ -83,7 +85,7 @@ const MobileChatList: React.FC = () => {
   if (isLoading || userRole === 'loading') {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-gray-500">Loading conversations...</div>
+        <div className="text-gray-500">{t('chat.loading')}</div>
       </div>
     );
   }
@@ -94,11 +96,11 @@ const MobileChatList: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <MessageCircle className="h-16 w-16 text-gray-300 mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No conversations yet</h3>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{t('chat.noConversations')}</h3>
         <p className="text-gray-500 dark:text-gray-400 mb-4">
           {isHost 
-            ? "Messages will appear here when guests contact you about your venues"
-            : "Messages will appear here when you contact hosts about venues"
+            ? t('chat.noConversationsHost')
+            : t('chat.noConversationsGuest')
           }
         </p>
       </div>
@@ -116,8 +118,8 @@ const MobileChatList: React.FC = () => {
         const isHost = conversation.host_id === user?.id;
         const otherUserProfile = conversation.otherUserProfile;
         const displayName = isHost 
-          ? (otherUserProfile?.full_name || 'Guest')
-          : (otherUserProfile?.business_name || otherUserProfile?.full_name || 'Host');
+          ? (otherUserProfile?.full_name || t('chat.guest'))
+          : (otherUserProfile?.business_name || otherUserProfile?.full_name || t('chat.host'));
 
         return (
           <Link 

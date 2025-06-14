@@ -128,6 +128,14 @@
   @apply bg-white dark:bg-card p-6 rounded-lg shadow-sm border border-champagne-100 dark:border-champagne-900/40;
 }
 
+.elegant-input {
+  @apply w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blush-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white;
+}
+
+.category-tag {
+  @apply px-4 py-2 bg-champagne-100 dark:bg-champagne-900/20 text-champagne-800 dark:text-champagne-200 rounded-full text-sm font-medium border border-champagne-200 dark:border-champagne-800;
+}
+
 /* Animation */
 @keyframes slide-in {
   from {
@@ -140,8 +148,23 @@
   }
 }
 
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-slide-in {
   animation: slide-in 0.2s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out;
 }
 
 /* RTL-specific styles */
@@ -157,6 +180,50 @@
 [dir="rtl"] .font-script {
   font-family: 'Inter', 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
   font-style: italic;
+}
+
+/* RTL Chat and Messaging Layout */
+[dir="rtl"] .chat-message-bubble {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .message-sender {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .message-sender .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+  margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+  margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+[dir="rtl"] .message-content {
+  text-align: right;
+}
+
+/* RTL Avatar positioning */
+[dir="rtl"] .avatar-container {
+  order: 2;
+}
+
+[dir="rtl"] .message-bubble {
+  order: 1;
+}
+
+/* RTL Border positioning */
+[dir="rtl"] .border-r-2 {
+  border-right-width: 0;
+  border-left-width: 2px;
+}
+
+[dir="rtl"] .rounded-br-md {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0.375rem;
+}
+
+[dir="rtl"] .rounded-bl-md {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0.375rem;
 }
 
 /* RTL spacing utilities */
@@ -190,10 +257,19 @@
   margin-left: calc(1.5rem * calc(1 - var(--tw-space-x-reverse)));
 }
 
+/* RTL Flexbox direction */
+[dir="rtl"] .flex-row-reverse {
+  flex-direction: row;
+}
+
+[dir="rtl"] .space-x-reverse {
+  --tw-space-x-reverse: 0;
+}
+
 /* RTL margins */
 [dir="rtl"] .ml-auto {
-  margin-left: auto;
-  margin-right: 0;
+  margin-left: 0;
+  margin-right: auto;
 }
 
 [dir="rtl"] .mr-2 {
@@ -204,6 +280,21 @@
 [dir="rtl"] .mr-3 {
   margin-right: 0;
   margin-left: 0.75rem;
+}
+
+[dir="rtl"] .mr-4 {
+  margin-right: 0;
+  margin-left: 1rem;
+}
+
+[dir="rtl"] .ml-2 {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+[dir="rtl"] .ml-16 {
+  margin-left: 0;
+  margin-right: 4rem;
 }
 
 /* RTL padding */
@@ -217,10 +308,24 @@
   padding-right: 2.5rem;
 }
 
+[dir="rtl"] .pr-3 {
+  padding-right: 0;
+  padding-left: 0.75rem;
+}
+
 /* RTL positioning for icons */
 [dir="rtl"] .absolute.left-3 {
   left: auto;
   right: 0.75rem;
+}
+
+[dir="rtl"] .-right-0\.5 {
+  right: auto;
+  left: -0.125rem;
+}
+
+[dir="rtl"] .-bottom-0\.5 {
+  bottom: -0.125rem;
 }
 
 /* RTL text alignment */
@@ -232,9 +337,26 @@
   text-align: left;
 }
 
+[dir="rtl"] .justify-start {
+  justify-content: flex-end;
+}
+
+[dir="rtl"] .justify-end {
+  justify-content: flex-start;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .section-title {
     @apply text-2xl;
+  }
+  
+  /* Mobile RTL adjustments */
+  [dir="rtl"] .mobile-chat-avatar {
+    order: 2;
+  }
+  
+  [dir="rtl"] .mobile-chat-content {
+    order: 1;
   }
 }

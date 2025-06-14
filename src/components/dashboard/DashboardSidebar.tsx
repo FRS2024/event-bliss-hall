@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Plus, Calendar, MessageSquare, Settings } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   Sidebar,
   SidebarContent,
@@ -15,14 +16,15 @@ import { useUserRole } from '@/hooks/useUserRole';
 const DashboardSidebar: React.FC = () => {
   const location = useLocation();
   const userRole = useUserRole();
+  const { t } = useTranslation();
   
   // Define all menu items with role restrictions
   const allMenuItems = [
-    { icon: Home, label: 'Overview', path: '/dashboard', roles: ['host'] },
-    { icon: Plus, label: 'Add Venue', path: '/dashboard/add-venue', roles: ['host'] },
-    { icon: Calendar, label: 'Bookings', path: '/dashboard/bookings', roles: ['host', 'guest'] },
-    { icon: MessageSquare, label: 'Messages', path: '/dashboard/messages', roles: ['host', 'guest'] },
-    { icon: Settings, label: 'Settings', path: '/dashboard/settings', roles: ['host'] },
+    { icon: Home, label: t('dashboard.overview'), path: '/dashboard', roles: ['host'] },
+    { icon: Plus, label: t('dashboard.addVenue'), path: '/dashboard/add-venue', roles: ['host'] },
+    { icon: Calendar, label: t('dashboard.bookings'), path: '/dashboard/bookings', roles: ['host', 'guest'] },
+    { icon: MessageSquare, label: t('dashboard.messages'), path: '/dashboard/messages', roles: ['host', 'guest'] },
+    { icon: Settings, label: t('dashboard.settings'), path: '/dashboard/settings', roles: ['host'] },
   ];
 
   // Filter menu items based on user role
@@ -32,8 +34,8 @@ const DashboardSidebar: React.FC = () => {
 
   // Determine dashboard title based on role
   const getDashboardTitle = () => {
-    if (userRole === 'loading') return 'Dashboard';
-    return userRole === 'host' ? 'Host Dashboard' : 'Guest Dashboard';
+    if (userRole === 'loading') return t('dashboard.title');
+    return userRole === 'host' ? t('dashboard.hostDashboard') : t('dashboard.guestDashboard');
   };
 
   return (
