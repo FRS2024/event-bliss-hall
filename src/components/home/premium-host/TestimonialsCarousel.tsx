@@ -9,33 +9,22 @@ interface Testimonial {
   image: string;
   quote: string;
   rating: number;
-  earnings: string;
 }
 
 const testimonials: Testimonial[] = [
-  {
-    name: 'Sarah Mitchell',
-    venue: 'The Grand Ballroom',
-    image: 'https://images.unsplash.com/photo-1494790108755-2616c88f0da9?w=100&h=100&fit=crop&crop=face',
-    quote: 'EasyHall transformed my venue business. I\'ve tripled my bookings in just 6 months!',
-    rating: 5,
-    earnings: '$25,000'
-  },
   {
     name: 'Michael Chen',
     venue: 'Garden Pavilion',
     image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
     quote: 'The platform is incredibly easy to use. Professional photos made all the difference.',
-    rating: 5,
-    earnings: '$18,500'
+    rating: 5
   },
   {
     name: 'Elena Rodriguez',
     venue: 'Coastal Events Center',
     image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
     quote: 'From zero bookings to fully booked weekends. This platform changed everything!',
-    rating: 5,
-    earnings: '$32,000'
+    rating: 5
   }
 ];
 
@@ -59,7 +48,6 @@ const TestimonialsCarousel: React.FC = () => {
                 <div>
                   <div className="font-semibold">{testimonial.name}</div>
                   <div className="text-sm text-muted-foreground">{testimonial.venue}</div>
-                  <div className="text-sm font-semibold text-green-600">Earned {testimonial.earnings}</div>
                 </div>
                 <div className="flex justify-center gap-1">
                   {[...Array(testimonial.rating)].map((_, i) => (
