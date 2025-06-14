@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -129,7 +128,7 @@ const PremiumHostSection: React.FC = () => {
                 <span className="text-sm font-medium text-blush-700 dark:text-blush-300">Join 10,000+ Successful Hosts</span>
               </div>
               
-              <h2 className="font-display text-4xl md:text-6xl lg:text-7xl bg-gradient-to-r from-blush-600 via-champagne-600 to-gold-600 bg-clip-text text-transparent leading-tight">
+              <h2 className="font-display text-3xl md:text-5xl lg:text-6xl bg-gradient-to-r from-blush-600 via-champagne-600 to-gold-600 bg-clip-text text-transparent leading-snug tracking-wide">
                 Transform Your Space Into Profit
               </h2>
               
