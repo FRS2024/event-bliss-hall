@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +21,8 @@ interface VenueFormData {
   pricePerHour?: number;
   pricePerDay?: number;
   pricePerEvent?: number;
+  latitude?: number;
+  longitude?: number;
 }
 
 const AddVenueForm: React.FC = () => {
@@ -33,10 +34,12 @@ const AddVenueForm: React.FC = () => {
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<VenueFormData>();
 
-  // Ensure the city and category fields are properly registered
+  // Ensure the required fields are properly registered
   React.useEffect(() => {
     register('city', { required: 'City is required' });
     register('category', { required: 'Category is required' });
+    register('latitude');
+    register('longitude');
   }, [register]);
 
   // Check authentication on component mount
@@ -91,7 +94,7 @@ const AddVenueForm: React.FC = () => {
     try {
       console.log('Creating venue for user:', user.id);
 
-      // Create venue
+      // Create venue with coordinates
       const { data: venue, error: venueError } = await supabase
         .from('venues')
         .insert({
@@ -105,6 +108,8 @@ const AddVenueForm: React.FC = () => {
           price_per_hour: data.pricePerHour ? Number(data.pricePerHour) : null,
           price_per_day: data.pricePerDay ? Number(data.pricePerDay) : null,
           price_per_event: data.pricePerEvent ? Number(data.pricePerEvent) : null,
+          latitude: data.latitude || null,
+          longitude: data.longitude || null,
         })
         .select()
         .single();
@@ -169,7 +174,7 @@ const AddVenueForm: React.FC = () => {
         }
       }
 
-      toast.success('Venue created successfully!');
+      toast.success('Venue created successfully with location data!');
       navigate('/dashboard');
     } catch (error: any) {
       console.error('Error creating venue:', error);
@@ -194,7 +199,7 @@ const AddVenueForm: React.FC = () => {
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Add New Venue</h1>
-        <p className="text-gray-600 dark:text-gray-400">Create a new venue listing</p>
+        <p className="text-gray-600 dark:text-gray-400">Create a new venue listing with precise location</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
