@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import Hero from '@/components/home/Hero';
 import VenueGrid from '@/components/venues/VenueGrid';
+import PremiumHostSection from '@/components/home/PremiumHostSection';
 import { Button } from '@/components/ui/button';
 import { Venue } from '@/types';
 import { getFeaturedVenues } from '@/lib/api';
@@ -86,40 +87,7 @@ const Index: React.FC = () => {
         </div>
       </section>
       
-      <section className="page-container py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-          <div>
-            <h2 className="font-script text-3xl md:text-4xl text-blush-500 dark:text-blush-400 mb-4">
-              List Your Venue With Us
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              Are you a venue owner? Partner with EasyHall to reach more clients and manage your bookings seamlessly. Our platform makes it easy to showcase your space to people planning their special events.
-            </p>
-            <ul className="space-y-3 mb-6">
-              {['Reach more clients', 'Easy booking management', 'Professional photos', 'Verified reviews'].map((item, index) => (
-                <li key={index} className="flex items-center">
-                  <span className="w-5 h-5 bg-champagne-100 dark:bg-champagne-900 rounded-full flex items-center justify-center mr-2">
-                    <span className="w-2 h-2 bg-champagne-500 rounded-full"></span>
-                  </span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <Link to="/signup">
-              <Button className="bg-blush-400 hover:bg-blush-500 text-white">
-                Become a Host
-              </Button>
-            </Link>
-          </div>
-          <div className="rounded-lg overflow-hidden shadow-lg">
-            <img 
-              src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2968&q=80" 
-              alt="Venue hosting" 
-              className="w-full h-auto" 
-            />
-          </div>
-        </div>
-      </section>
+      <PremiumHostSection />
     </MainLayout>
   );
 };
