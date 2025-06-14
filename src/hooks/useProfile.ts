@@ -43,7 +43,7 @@ export const useProfile = () => {
     },
     enabled: !!user,
     staleTime: 0, // Always fetch fresh data
-    cacheTime: 1000 * 60 * 5, // Cache for 5 minutes
+    gcTime: 1000 * 60 * 5, // Cache for 5 minutes (replaced cacheTime)
   });
 
   const updateProfileMutation = useMutation({
