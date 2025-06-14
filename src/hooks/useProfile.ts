@@ -26,15 +26,42 @@ export const useProfile = () => {
 
       console.log('🔍 Fetching profile for user:', user.id);
       
+      // Use maybeSingle() instead of single() to handle missing profiles
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('❌ Error fetching profile:', error);
         throw error;
+      }
+      
+      // If no profile exists, create one
+      if (!data) {
+        console.log('📝 No profile found, creating new profile for user:', user.id);
+        
+        const newProfile = {
+          id: user.id,
+          full_name: user.user_metadata?.full_name || '',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+
+        const { data: createdProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert([newProfile])
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('❌ Error creating profile:', createError);
+          throw createError;
+        }
+
+        console.log('✅ Profile created successfully:', createdProfile);
+        return createdProfile as Profile;
       }
       
       console.log('✅ Profile fetched successfully:', data);
@@ -108,11 +135,12 @@ export const useUserProfile = (userId: string) => {
 
       console.log('🔍 Fetching user profile for:', userId);
       
+      // Use maybeSingle() here as well for consistency
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('❌ Error fetching user profile:', error);
