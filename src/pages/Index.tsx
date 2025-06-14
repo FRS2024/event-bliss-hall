@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import Hero from '@/components/home/Hero';
 import VenueGrid from '@/components/venues/VenueGrid';
@@ -36,12 +37,14 @@ const Index: React.FC = () => {
         <h2 className="section-title">Featured Venues</h2>
         <VenueGrid venues={venues} isLoading={isLoading} />
         <div className="flex justify-center mt-10">
-          <Button 
-            variant="outline"
-            className="border-blush-200 text-blush-500 hover:bg-blush-50 dark:border-blush-800 dark:text-blush-400 dark:hover:bg-blush-900/20 px-8 py-6"
-          >
-            View All Venues
-          </Button>
+          <Link to="/venues">
+            <Button 
+              variant="outline"
+              className="border-blush-200 text-blush-500 hover:bg-blush-50 dark:border-blush-800 dark:text-blush-400 dark:hover:bg-blush-900/20 px-8 py-6"
+            >
+              View All Venues
+            </Button>
+          </Link>
         </div>
       </section>
       
@@ -102,9 +105,11 @@ const Index: React.FC = () => {
                 </li>
               ))}
             </ul>
-            <Button className="bg-blush-400 hover:bg-blush-500 text-white">
-              Become a Host
-            </Button>
+            <Link to="/signup">
+              <Button className="bg-blush-400 hover:bg-blush-500 text-white">
+                Become a Host
+              </Button>
+            </Link>
           </div>
           <div className="rounded-lg overflow-hidden shadow-lg">
             <img 

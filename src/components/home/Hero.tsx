@@ -1,8 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Calendar, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import HeroSearch from './HeroSearch';
 
 const Hero: React.FC = () => {
   return (
@@ -28,58 +27,24 @@ const Hero: React.FC = () => {
           </p>
           
           {/* Search Box */}
-          <div 
-            className="bg-white dark:bg-card p-4 md:p-6 rounded-lg shadow-lg animate-fade-in" 
-            style={{ animationDelay: '0.4s' }}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <MapPin size={20} className="text-muted-foreground" />
-                </div>
-                <input 
-                  type="text" 
-                  placeholder="Location" 
-                  className="elegant-input pl-10"
-                />
-              </div>
-              
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Calendar size={20} className="text-muted-foreground" />
-                </div>
-                <input 
-                  type="text" 
-                  placeholder="Event Date" 
-                  className="elegant-input pl-10"
-                />
-              </div>
-              
-              <div>
-                <Button className="w-full bg-blush-400 hover:bg-blush-500 text-white">
-                  <Search size={20} className="mr-2" />
-                  Find Venues
-                </Button>
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap gap-3 mt-4">
-              <Link to="/categories/wedding" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
-                Weddings
-              </Link>
-              <Link to="/categories/birthday" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
-                Birthdays
-              </Link>
-              <Link to="/categories/corporate" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
-                Corporate
-              </Link>
-              <Link to="/categories/reception" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
-                Receptions
-              </Link>
-              <Link to="/categories/party" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
-                Parties
-              </Link>
-            </div>
+          <HeroSearch />
+          
+          <div className="flex flex-wrap gap-3 mt-6 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+            <Link to="/categories?category=wedding" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
+              Weddings
+            </Link>
+            <Link to="/categories?category=birthday" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
+              Birthdays
+            </Link>
+            <Link to="/categories?category=corporate" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
+              Corporate
+            </Link>
+            <Link to="/categories?category=reception" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
+              Receptions
+            </Link>
+            <Link to="/categories?category=party" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
+              Parties
+            </Link>
           </div>
         </div>
       </div>

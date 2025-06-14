@@ -17,6 +17,8 @@ import EditVenuePage from "./pages/EditVenuePage";
 import SettingsPage from "./pages/SettingsPage";
 import MyBookingsPage from "./pages/MyBookingsPage";
 import MessagesPage from "./pages/MessagesPage";
+import HowItWorksPage from "./pages/HowItWorksPage";
+import ContactPage from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +35,9 @@ const App = () => (
             <Route path="/venues" element={<VenuesPage />} />
             <Route path="/venues/:id" element={<VenueDetailPage />} />
             <Route path="/categories" element={<CategoriesPage />} />
+            <Route path="/categories/:category" element={<VenuesPage />} />
+            <Route path="/how-it-works" element={<HowItWorksPage />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/dashboard/*" element={<DashboardPage />} />
