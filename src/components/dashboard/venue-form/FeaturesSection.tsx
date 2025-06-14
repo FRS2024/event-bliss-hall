@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { VENUE_FEATURES } from '@/constants/venue';
 
 interface FeaturesSectionProps {
@@ -20,7 +20,8 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
         <CardTitle>Features & Amenities</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <Label>Available Features</Label>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
           {VENUE_FEATURES.map((feature) => (
             <div key={feature} className="flex items-center space-x-2">
               <Checkbox
@@ -28,7 +29,9 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
                 checked={selectedFeatures.includes(feature)}
                 onCheckedChange={() => onFeatureToggle(feature)}
               />
-              <Label htmlFor={feature} className="text-sm">{feature}</Label>
+              <Label htmlFor={feature} className="text-sm font-normal">
+                {feature}
+              </Label>
             </div>
           ))}
         </div>
