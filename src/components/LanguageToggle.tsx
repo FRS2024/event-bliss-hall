@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Languages } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 
@@ -14,16 +13,19 @@ const LanguageToggle: React.FC = () => {
     localStorage.setItem('language', newLanguage);
   };
 
+  const displayLanguage = currentLanguage === 'en' ? 'EN' : 'FR';
+  const nextLanguage = currentLanguage === 'en' ? 'Français' : 'English';
+
   return (
     <Button
       variant="ghost"
-      size="icon"
+      size="sm"
       onClick={toggleLanguage}
       aria-label={`Switch to ${currentLanguage === 'en' ? 'French' : 'English'}`}
-      className="rounded-full text-foreground min-h-[44px] min-w-[44px] touch-manipulation"
-      title={`${currentLanguage === 'en' ? 'Français' : 'English'}`}
+      className="rounded-full text-foreground min-h-[44px] min-w-[44px] touch-manipulation font-medium text-sm px-3"
+      title={`Switch to ${nextLanguage}`}
     >
-      <Languages size={20} />
+      {displayLanguage}
       <span className="sr-only">
         {currentLanguage === 'en' ? 'Passer au français' : 'Switch to English'}
       </span>
