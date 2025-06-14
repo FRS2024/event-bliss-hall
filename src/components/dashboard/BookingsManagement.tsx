@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,11 +8,14 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, MapPin, Users, DollarSign } from 'lucide-react';
 import { toast } from 'sonner';
 import { updateVenueAvailability } from '@/lib/api';
+import { useUserRole } from '@/hooks/useUserRole';
 
 const BookingsManagement: React.FC = () => {
   const queryClient = useQueryClient();
+  const userRole = useUserRole();
 
-  const { data: bookings, isLoading } = useQuery({
+  // Host bookings query - for venues they own
+  const { data: hostBookings, isLoading: hostLoading } = useQuery({
     queryKey: ['host-bookings'],
     queryFn: async () => {
       const { data: user } = await supabase.auth.getUser();
@@ -32,6 +36,32 @@ const BookingsManagement: React.FC = () => {
       if (error) throw error;
       return data;
     },
+    enabled: userRole === 'host',
+  });
+
+  // Guest bookings query - for bookings they made
+  const { data: guestBookings, isLoading: guestLoading } = useQuery({
+    queryKey: ['guest-bookings'],
+    queryFn: async () => {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('bookings')
+        .select(`
+          *,
+          venues (
+            name,
+            city
+          )
+        `)
+        .eq('guest_id', user.user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: userRole === 'guest',
   });
 
   const updateBookingMutation = useMutation({
@@ -57,6 +87,7 @@ const BookingsManagement: React.FC = () => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['host-bookings'] });
+      queryClient.invalidateQueries({ queryKey: ['guest-bookings'] });
       const statusMessage = variables.status === 'confirmed' 
         ? 'Booking confirmed and venue availability updated'
         : variables.status === 'cancelled'
@@ -74,6 +105,18 @@ const BookingsManagement: React.FC = () => {
     updateBookingMutation.mutate({ bookingId, status, venueId, eventDate });
   };
 
+  // Determine which data to use based on user role
+  const bookings = userRole === 'host' ? hostBookings : guestBookings;
+  const isLoading = userRole === 'host' ? hostLoading : guestLoading;
+
+  if (userRole === 'loading') {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -82,17 +125,37 @@ const BookingsManagement: React.FC = () => {
     );
   }
 
+  const getPageTitle = () => {
+    return userRole === 'host' ? 'Bookings Management' : 'My Bookings';
+  };
+
+  const getPageDescription = () => {
+    return userRole === 'host' 
+      ? 'Manage your venue bookings and requests'
+      : 'View and track your venue bookings';
+  };
+
+  const getEmptyStateTitle = () => {
+    return userRole === 'host' ? 'No bookings yet' : 'No bookings yet';
+  };
+
+  const getEmptyStateDescription = () => {
+    return userRole === 'host'
+      ? 'Bookings will appear here when customers book your venues'
+      : 'Your bookings will appear here once you make a reservation';
+  };
+
   if (!bookings || bookings.length === 0) {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Bookings Management</h1>
-          <p className="text-gray-600 dark:text-gray-400">Manage your venue bookings and requests</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{getPageTitle()}</h1>
+          <p className="text-gray-600 dark:text-gray-400">{getPageDescription()}</p>
         </div>
         <Card>
           <CardContent className="text-center py-8">
-            <h3 className="text-lg font-semibold mb-2">No bookings yet</h3>
-            <p className="text-gray-600">Bookings will appear here when customers book your venues</p>
+            <h3 className="text-lg font-semibold mb-2">{getEmptyStateTitle()}</h3>
+            <p className="text-gray-600">{getEmptyStateDescription()}</p>
           </CardContent>
         </Card>
       </div>
@@ -112,8 +175,8 @@ const BookingsManagement: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Bookings Management</h1>
-        <p className="text-gray-600 dark:text-gray-400">Manage your venue bookings and requests</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{getPageTitle()}</h1>
+        <p className="text-gray-600 dark:text-gray-400">{getPageDescription()}</p>
       </div>
 
       <div className="space-y-4">
@@ -176,7 +239,8 @@ const BookingsManagement: React.FC = () => {
                 </div>
               )}
 
-              {booking.status === 'pending' && (
+              {/* Host-specific actions */}
+              {userRole === 'host' && booking.status === 'pending' && (
                 <div className="flex space-x-2">
                   <Button 
                     size="sm" 
@@ -193,6 +257,18 @@ const BookingsManagement: React.FC = () => {
                   >
                     Decline
                   </Button>
+                </div>
+              )}
+
+              {/* Guest-specific information */}
+              {userRole === 'guest' && (
+                <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                    {booking.status === 'pending' && 'Your booking request is pending host approval.'}
+                    {booking.status === 'confirmed' && 'Your booking has been confirmed! Contact the host if you have any questions.'}
+                    {booking.status === 'cancelled' && 'This booking has been cancelled.'}
+                    {booking.status === 'completed' && 'This booking has been completed. We hope you had a great event!'}
+                  </p>
                 </div>
               )}
             </CardContent>
