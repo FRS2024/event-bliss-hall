@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User as UserIcon, Settings, Calendar, LayoutDashboard, LogOut } from 'lucide-react';
+import { User as UserIcon, Settings, Calendar, LayoutDashboard, LogOut, MessageCircle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 interface UserDropdownProps {
   onSignOut: () => void;
@@ -20,10 +21,8 @@ interface UserDropdownProps {
 
 const UserDropdown: React.FC<UserDropdownProps> = ({ onSignOut }) => {
   const { user } = useAuth();
+  const userRole = useUserRole();
   const navigate = useNavigate();
-
-  // For now, we'll simulate user role - in a real app this would come from user metadata or a profiles table
-  const userRole = 'host'; // This could be 'guest' or 'host' - you can implement role checking later
 
   const handleSignOut = () => {
     onSignOut();
@@ -38,6 +37,19 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ onSignOut }) => {
     // If user has a Google avatar, it would be in user.user_metadata.avatar_url
     return user?.user_metadata?.avatar_url || null;
   };
+
+  // Show loading state while determining user role
+  if (userRole === 'loading') {
+    return (
+      <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+        <Avatar className="h-10 w-10">
+          <AvatarFallback className="bg-blush-100 text-blush-600 dark:bg-blush-900 dark:text-blush-300">
+            {user?.email ? getInitials(user.email) : <UserIcon size={16} />}
+          </AvatarFallback>
+        </Avatar>
+      </Button>
+    );
+  }
 
   return (
     <DropdownMenu>
@@ -78,11 +90,18 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ onSignOut }) => {
           </Link>
         </DropdownMenuItem>
         
-        {userRole === 'host' && (
+        {userRole === 'host' ? (
           <DropdownMenuItem asChild>
             <Link to="/dashboard" className="flex items-center">
               <LayoutDashboard className="mr-2 h-4 w-4" />
               <span>Host Dashboard</span>
+            </Link>
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem asChild>
+            <Link to="/messages" className="flex items-center">
+              <MessageCircle className="mr-2 h-4 w-4" />
+              <span>My Messages</span>
             </Link>
           </DropdownMenuItem>
         )}

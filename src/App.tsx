@@ -16,6 +16,7 @@ import DashboardPage from "./pages/DashboardPage";
 import EditVenuePage from "./pages/EditVenuePage";
 import SettingsPage from "./pages/SettingsPage";
 import MyBookingsPage from "./pages/MyBookingsPage";
+import MessagesPage from "./pages/MessagesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/dashboard/venues/:id/edit" element={<EditVenuePage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/my-bookings" element={<MyBookingsPage />} />
+            <Route path="/messages" element={<MessagesPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
