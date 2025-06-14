@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import VenueGrid from '@/components/venues/VenueGrid';
 import VenueFilters from '@/components/venues/VenueFilters';
@@ -10,6 +11,7 @@ const VenuesPage: React.FC = () => {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [filteredVenues, setFilteredVenues] = useState<Venue[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchParams] = useSearchParams();
   
   useEffect(() => {
     const loadVenues = async () => {
@@ -17,7 +19,17 @@ const VenuesPage: React.FC = () => {
       try {
         const data = await getAllVenues();
         setVenues(data);
-        setFilteredVenues(data);
+        
+        // Apply category filter from URL if present
+        const categoryParam = searchParams.get('category');
+        if (categoryParam) {
+          const filtered = data.filter(venue => 
+            venue.category.toLowerCase() === categoryParam.toLowerCase()
+          );
+          setFilteredVenues(filtered);
+        } else {
+          setFilteredVenues(data);
+        }
       } catch (error) {
         console.error('Error loading venues:', error);
       } finally {
@@ -26,7 +38,7 @@ const VenuesPage: React.FC = () => {
     };
     
     loadVenues();
-  }, []);
+  }, [searchParams]);
   
   const handleFilter = (filters: any) => {
     let results = [...venues];
@@ -72,16 +84,22 @@ const VenuesPage: React.FC = () => {
     
     setFilteredVenues(results);
   };
+
+  // Get the current category from URL for display
+  const currentCategory = searchParams.get('category');
   
   return (
     <MainLayout>
       <div className="bg-champagne-50 dark:bg-champagne-900/20 py-12">
         <div className="container mx-auto px-4">
           <h1 className="font-script text-4xl md:text-5xl text-center text-blush-500 dark:text-blush-400 mb-4">
-            Find Your Perfect Venue
+            {currentCategory ? `${currentCategory} Venues` : 'Find Your Perfect Venue'}
           </h1>
           <p className="text-center text-muted-foreground max-w-2xl mx-auto">
-            Browse our extensive collection of stunning venues for weddings, birthdays, corporate events, and special occasions.
+            {currentCategory 
+              ? `Discover amazing ${currentCategory.toLowerCase()} venues for your special occasion.`
+              : 'Browse our extensive collection of stunning venues for weddings, birthdays, corporate events, and special occasions.'
+            }
           </p>
         </div>
       </div>
@@ -96,6 +114,7 @@ const VenuesPage: React.FC = () => {
             <div className="flex justify-between items-center mb-6">
               <p className="text-muted-foreground">
                 {filteredVenues.length} {filteredVenues.length === 1 ? 'venue' : 'venues'} found
+                {currentCategory && ` in ${currentCategory}`}
               </p>
               <div className="flex items-center space-x-2">
                 <label htmlFor="sort" className="text-sm text-muted-foreground">
