@@ -1,9 +1,12 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import HeroSearch from './HeroSearch';
 
 const Hero: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="relative min-h-[600px] flex items-center">
       {/* Hero Background */}
@@ -31,19 +34,19 @@ const Hero: React.FC = () => {
           
           <div className="flex flex-wrap gap-3 mt-6 animate-fade-in" style={{ animationDelay: '0.6s' }}>
             <Link to="/categories?category=wedding" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
-              Weddings
+              {t('categories.wedding')}
             </Link>
             <Link to="/categories?category=birthday" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
-              Birthdays
+              {t('categories.birthday')}
             </Link>
             <Link to="/categories?category=corporate" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
-              Corporate
+              {t('categories.corporate')}
             </Link>
             <Link to="/categories?category=reception" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
               Receptions
             </Link>
             <Link to="/categories?category=party" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
-              Parties
+              {t('categories.party')}
             </Link>
           </div>
         </div>

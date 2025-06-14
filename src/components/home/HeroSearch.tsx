@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Search, Calendar, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
@@ -13,6 +14,7 @@ interface HeroSearchProps {
 }
 
 const HeroSearch: React.FC<HeroSearchProps> = ({ onSearch }) => {
+  const { t } = useTranslation();
   const [location, setLocation] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [category, setCategory] = useState('');
@@ -50,7 +52,7 @@ const HeroSearch: React.FC<HeroSearchProps> = ({ onSearch }) => {
             </div>
             <input 
               type="text"
-              placeholder="Location (e.g., New York, Chicago)"
+              placeholder={t('filters.location')}
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               className="elegant-input pl-10"
@@ -68,7 +70,7 @@ const HeroSearch: React.FC<HeroSearchProps> = ({ onSearch }) => {
                   )}
                 >
                   <Calendar size={20} className="absolute left-3 text-muted-foreground" />
-                  {selectedDate ? format(selectedDate, "PPP") : "Event Date"}
+                  {selectedDate ? format(selectedDate, "PPP") : t('booking.eventDate')}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -90,7 +92,7 @@ const HeroSearch: React.FC<HeroSearchProps> = ({ onSearch }) => {
               className="w-full bg-blush-400 hover:bg-blush-500 text-white"
             >
               <Search size={20} className="mr-2" />
-              Find Venues
+              {t('venues.viewDetails')}
             </Button>
           </div>
         </div>

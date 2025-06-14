@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
-import { ChevronDownIcon, GlobeIcon } from 'lucide-react';
+import { ChevronDownIcon } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,12 +40,11 @@ const LanguageToggle: React.FC = () => {
         <Button
           variant="ghost"
           size="sm"
-          className="rounded-full text-foreground min-h-[44px] min-w-[44px] touch-manipulation font-medium text-sm px-3 hover:bg-blush-50 dark:hover:bg-blush-900/20"
+          className="rounded-full text-foreground min-h-[44px] px-3 touch-manipulation font-medium text-sm hover:bg-blush-50 dark:hover:bg-blush-900/20"
           aria-label="Change language"
         >
           <div className="flex items-center space-x-1">
-            <span className="text-lg">{currentLanguage.flag}</span>
-            <span className="hidden sm:inline text-xs font-medium">
+            <span className="font-medium text-sm">
               {currentLanguage.code.toUpperCase()}
             </span>
             <ChevronDownIcon className="h-3 w-3 opacity-50" />
@@ -55,7 +54,7 @@ const LanguageToggle: React.FC = () => {
       
       <DropdownMenuContent 
         align="end" 
-        className="w-48 bg-white dark:bg-gray-900 border border-champagne-200 dark:border-champagne-800 rounded-lg shadow-lg"
+        className="w-48 bg-white dark:bg-gray-900 border border-champagne-200 dark:border-champagne-800 rounded-lg shadow-lg z-50"
       >
         {languages.map((language) => (
           <DropdownMenuItem
