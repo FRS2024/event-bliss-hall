@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Search, Navigation } from 'lucide-react';
 import { ALGERIA_CITIES } from '@/constants/venue';
+
+// Import Leaflet CSS - this should work once leaflet is properly installed
 import 'leaflet/dist/leaflet.css';
 
 // Fix for default markers in react-leaflet
