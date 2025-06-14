@@ -1,0 +1,55 @@
+
+{
+  "nav": {
+    "venues": "Venues",
+    "categories": "Categories",
+    "howItWorks": "How It Works",
+    "contact": "Contact",
+    "login": "Login",
+    "signup": "Sign Up",
+    "messages": "Messages",
+    "myBookings": "My Bookings",
+    "mySettings": "My Settings",
+    "myDashboard": "My Dashboard",
+    "logout": "Log out"
+  },
+  "chat": {
+    "title": "Chats",
+    "search": "Search for chats and messages",
+    "welcome": "Welcome, {{email}}"
+  },
+  "home": {
+    "featuredVenues": "Featured Venues",
+    "viewAllVenues": "View All Venues",
+    "howItWorksTitle": "How It Works",
+    "findVenue": "Find a Venue",
+    "findVenueDesc": "Search through our curated collection of beautiful venues for any event type.",
+    "bookDate": "Book Your Date",
+    "bookDateDesc": "Select your date, review venue details, and secure your booking online.",
+    "celebrate": "Celebrate!",
+    "celebrateDesc": "Enjoy your special day in a perfect venue that matches your vision."
+  },
+  "howItWorks": {
+    "title": "How EasyHall Works",
+    "subtitle": "Discover the simple process of finding and booking your perfect venue for any occasion.",
+    "searchDiscover": "Search & Discover",
+    "searchDiscoverDesc": "Browse our curated collection of venues by location, date, and event type. Use our smart filters to find exactly what you're looking for.",
+    "bookYourDate": "Book Your Date",
+    "bookYourDateDesc": "Select your preferred date, review pricing and amenities, then secure your booking with our easy online process.",
+    "celebrateTitle": "Celebrate!",
+    "celebrateSubtitle": "Enjoy your special event in a beautiful venue that perfectly matches your vision and budget.",
+    "whyChoose": "Why Choose EasyHall?",
+    "verifiedVenues": "Verified Venues",
+    "verifiedVenuesDesc": "All venues are thoroughly vetted and verified for quality and reliability.",
+    "secureBooking": "Secure Booking",
+    "secureBookingDesc": "Your payments are protected with secure processing and booking guarantee.",
+    "support247": "24/7 Support",
+    "support247Desc": "Our dedicated support team is here to help you every step of the way.",
+    "noHiddenFees": "No Hidden Fees",
+    "noHiddenFeesDesc": "Transparent pricing with no surprise charges or hidden fees.",
+    "readyToStart": "Ready to Get Started?",
+    "readyToStartDesc": "Find your perfect venue today and make your event unforgettable.",
+    "browseVenues": "Browse Venues",
+    "createAccount": "Create Account"
+  }
+}

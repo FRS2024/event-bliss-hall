@@ -8,10 +8,12 @@ import PremiumHostSection from '@/components/home/PremiumHostSection';
 import { Button } from '@/components/ui/button';
 import { Venue } from '@/types';
 import { getFeaturedVenues } from '@/lib/api';
+import { useTranslation } from 'react-i18next';
 
 const Index: React.FC = () => {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation();
   
   useEffect(() => {
     // In a real application, this would fetch from your API
@@ -35,7 +37,7 @@ const Index: React.FC = () => {
       <Hero />
       
       <section className="page-container py-16">
-        <h2 className="section-title">Featured Venues</h2>
+        <h2 className="section-title">{t('home.featuredVenues')}</h2>
         <VenueGrid venues={venues} isLoading={isLoading} />
         <div className="flex justify-center mt-10">
           <Link to="/venues">
@@ -43,7 +45,7 @@ const Index: React.FC = () => {
               variant="outline"
               className="border-blush-200 text-blush-500 hover:bg-blush-50 dark:border-blush-800 dark:text-blush-400 dark:hover:bg-blush-900/20 px-8 py-6"
             >
-              View All Venues
+              {t('home.viewAllVenues')}
             </Button>
           </Link>
         </div>
@@ -51,16 +53,16 @@ const Index: React.FC = () => {
       
       <section className="bg-champagne-50 dark:bg-champagne-900/20 py-16">
         <div className="container mx-auto px-4">
-          <h2 className="section-title">How It Works</h2>
+          <h2 className="section-title">{t('home.howItWorksTitle')}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10">
             <div className="elegant-card text-center">
               <div className="w-16 h-16 bg-blush-100 dark:bg-blush-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="font-script text-2xl text-blush-500 dark:text-blush-400">1</span>
               </div>
-              <h3 className="font-serif text-xl mb-3">Find a Venue</h3>
+              <h3 className="font-serif text-xl mb-3">{t('home.findVenue')}</h3>
               <p className="text-muted-foreground">
-                Search through our curated collection of beautiful venues for any event type.
+                {t('home.findVenueDesc')}
               </p>
             </div>
             
@@ -68,9 +70,9 @@ const Index: React.FC = () => {
               <div className="w-16 h-16 bg-blush-100 dark:bg-blush-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="font-script text-2xl text-blush-500 dark:text-blush-400">2</span>
               </div>
-              <h3 className="font-serif text-xl mb-3">Book Your Date</h3>
+              <h3 className="font-serif text-xl mb-3">{t('home.bookDate')}</h3>
               <p className="text-muted-foreground">
-                Select your date, review venue details, and secure your booking online.
+                {t('home.bookDateDesc')}
               </p>
             </div>
             
@@ -78,9 +80,9 @@ const Index: React.FC = () => {
               <div className="w-16 h-16 bg-blush-100 dark:bg-blush-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="font-script text-2xl text-blush-500 dark:text-blush-400">3</span>
               </div>
-              <h3 className="font-serif text-xl mb-3">Celebrate!</h3>
+              <h3 className="font-serif text-xl mb-3">{t('home.celebrate')}</h3>
               <p className="text-muted-foreground">
-                Enjoy your special day in a perfect venue that matches your vision.
+                {t('home.celebrateDesc')}
               </p>
             </div>
           </div>

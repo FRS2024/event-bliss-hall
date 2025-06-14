@@ -4,12 +4,15 @@ import { Link } from 'react-router-dom';
 import { Menu, X, Search, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/ThemeToggle';
+import LanguageToggle from '@/components/LanguageToggle';
 import UserDropdown from '@/components/UserDropdown';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { t } = useTranslation();
   
   const handleSignOut = async () => {
     await signOut();
@@ -28,16 +31,16 @@ const Header: React.FC = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-6 items-center">
             <Link to="/venues" className="text-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
-              Venues
+              {t('nav.venues')}
             </Link>
             <Link to="/categories" className="text-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
-              Categories
+              {t('nav.categories')}
             </Link>
             <Link to="/how-it-works" className="text-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
-              How It Works
+              {t('nav.howItWorks')}
             </Link>
             <Link to="/contact" className="text-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
-              Contact
+              {t('nav.contact')}
             </Link>
           </nav>
           
@@ -46,6 +49,7 @@ const Header: React.FC = () => {
             <Button variant="ghost" size="icon" className="text-foreground">
               <Search size={20} />
             </Button>
+            <LanguageToggle />
             <ThemeToggle />
             {user ? (
               <UserDropdown onSignOut={handleSignOut} />
@@ -53,12 +57,12 @@ const Header: React.FC = () => {
               <>
                 <Link to="/login">
                   <Button variant="outline" size="sm" className="border-blush-200 text-blush-500 hover:bg-blush-50 dark:border-blush-800 dark:text-blush-400 dark:hover:bg-blush-900/20">
-                    Login
+                    {t('nav.login')}
                   </Button>
                 </Link>
                 <Link to="/signup">
                   <Button size="sm" className="bg-blush-400 hover:bg-blush-500 text-white">
-                    Sign Up
+                    {t('nav.signup')}
                   </Button>
                 </Link>
               </>
@@ -80,6 +84,7 @@ const Header: React.FC = () => {
                 </Link>
               </Button>
             )}
+            <LanguageToggle />
             <ThemeToggle />
             <Button
               variant="ghost"
@@ -102,64 +107,64 @@ const Header: React.FC = () => {
               className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors"
               onClick={() => setIsOpen(false)}
             >
-              Venues
+              {t('nav.venues')}
             </Link>
             <Link 
               to="/categories" 
               className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors"
               onClick={() => setIsOpen(false)}
             >
-              Categories
+              {t('nav.categories')}
             </Link>
             <Link 
               to="/how-it-works" 
               className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors"
               onClick={() => setIsOpen(false)}
             >
-              How It Works
+              {t('nav.howItWorks')}
             </Link>
             <Link 
               to="/contact" 
               className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors"
               onClick={() => setIsOpen(false)}
             >
-              Contact
+              {t('nav.contact')}
             </Link>
             <div className="pt-4 border-t border-champagne-100 dark:border-champagne-900/40 flex flex-col space-y-2">
               {user ? (
                 <>
-                  <span className="px-4 py-2 text-sm text-muted-foreground">Welcome, {user.email}</span>
+                  <span className="px-4 py-2 text-sm text-muted-foreground">{t('chat.welcome', { email: user.email })}</span>
                   <Link to="/my-bookings" className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors flex items-center" onClick={() => setIsOpen(false)}>
-                    My Bookings
+                    {t('nav.myBookings')}
                   </Link>
                   <Link to="/messages" className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors flex items-center" onClick={() => setIsOpen(false)}>
                     <MessageSquare className="h-4 w-4 mr-2" />
-                    Messages
+                    {t('nav.messages')}
                   </Link>
                   <Link to="/settings" className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors" onClick={() => setIsOpen(false)}>
-                    My Settings
+                    {t('nav.mySettings')}
                   </Link>
                   <Link to="/dashboard" className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors" onClick={() => setIsOpen(false)}>
-                    My Dashboard
+                    {t('nav.myDashboard')}
                   </Link>
                   <Button 
                     variant="outline" 
                     className="w-full border-blush-200 text-blush-500 dark:border-blush-800 dark:text-blush-400"
                     onClick={handleSignOut}
                   >
-                    Log out
+                    {t('nav.logout')}
                   </Button>
                 </>
               ) : (
                 <>
                   <Link to="/login" onClick={() => setIsOpen(false)}>
                     <Button variant="outline" className="w-full border-blush-200 text-blush-500 dark:border-blush-800 dark:text-blush-400">
-                      Login
+                      {t('nav.login')}
                     </Button>
                   </Link>
                   <Link to="/signup" onClick={() => setIsOpen(false)}>
                     <Button className="w-full bg-blush-400 hover:bg-blush-500 text-white">
-                      Sign Up
+                      {t('nav.signup')}
                     </Button>
                   </Link>
                 </>

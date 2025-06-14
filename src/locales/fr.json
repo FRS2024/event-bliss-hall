@@ -1,0 +1,55 @@
+
+{
+  "nav": {
+    "venues": "Lieux",
+    "categories": "Catégories",
+    "howItWorks": "Comment ça marche",
+    "contact": "Contact",
+    "login": "Connexion",
+    "signup": "S'inscrire",
+    "messages": "Messages",
+    "myBookings": "Mes réservations",
+    "mySettings": "Mes paramètres",
+    "myDashboard": "Mon tableau de bord",
+    "logout": "Se déconnecter"
+  },
+  "chat": {
+    "title": "Discussions",
+    "search": "Rechercher des discussions et messages",
+    "welcome": "Bienvenue, {{email}}"
+  },
+  "home": {
+    "featuredVenues": "Lieux en vedette",
+    "viewAllVenues": "Voir tous les lieux",
+    "howItWorksTitle": "Comment ça marche",
+    "findVenue": "Trouvez un lieu",
+    "findVenueDesc": "Parcourez notre collection soignée de beaux lieux pour tout type d'événement.",
+    "bookDate": "Réservez votre date",
+    "bookDateDesc": "Sélectionnez votre date, consultez les détails du lieu et sécurisez votre réservation en ligne.",
+    "celebrate": "Célébrez !",
+    "celebrateDesc": "Profitez de votre journée spéciale dans un lieu parfait qui correspond à votre vision."
+  },
+  "howItWorks": {
+    "title": "Comment fonctionne EasyHall",
+    "subtitle": "Découvrez le processus simple pour trouver et réserver votre lieu parfait pour toute occasion.",
+    "searchDiscover": "Rechercher et découvrir",
+    "searchDiscoverDesc": "Parcourez notre collection soignée de lieux par emplacement, date et type d'événement. Utilisez nos filtres intelligents pour trouver exactement ce que vous cherchez.",
+    "bookYourDate": "Réservez votre date",
+    "bookYourDateDesc": "Sélectionnez votre date préférée, consultez les tarifs et les équipements, puis sécurisez votre réservation avec notre processus en ligne facile.",
+    "celebrateTitle": "Célébrez !",
+    "celebrateSubtitle": "Profitez de votre événement spécial dans un beau lieu qui correspond parfaitement à votre vision et votre budget.",
+    "whyChoose": "Pourquoi choisir EasyHall ?",
+    "verifiedVenues": "Lieux vérifiés",
+    "verifiedVenuesDesc": "Tous les lieux sont soigneusement vérifiés et certifiés pour la qualité et la fiabilité.",
+    "secureBooking": "Réservation sécurisée",
+    "secureBookingDesc": "Vos paiements sont protégés avec un traitement sécurisé et une garantie de réservation.",
+    "support247": "Support 24/7",
+    "support247Desc": "Notre équipe de support dédiée est là pour vous aider à chaque étape.",
+    "noHiddenFees": "Pas de frais cachés",
+    "noHiddenFeesDesc": "Tarification transparente sans frais surprises ou cachés.",
+    "readyToStart": "Prêt à commencer ?",
+    "readyToStartDesc": "Trouvez votre lieu parfait aujourd'hui et rendez votre événement inoubliable.",
+    "browseVenues": "Parcourir les lieux",
+    "createAccount": "Créer un compte"
+  }
+}
