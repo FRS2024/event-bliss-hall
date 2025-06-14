@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Search } from 'lucide-react';
+import { Menu, X, Search, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/ThemeToggle';
 import UserDropdown from '@/components/UserDropdown';
@@ -66,7 +66,20 @@ const Header: React.FC = () => {
           </div>
           
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-4">
+          <div className="md:hidden flex items-center space-x-2">
+            {user && (
+              <Button
+                variant="ghost"
+                size="icon"
+                asChild
+                className="text-foreground hover:text-blush-500 dark:hover:text-blush-400 h-10 w-10"
+                aria-label="Messages"
+              >
+                <Link to="/messages">
+                  <MessageSquare size={20} />
+                </Link>
+              </Button>
+            )}
             <ThemeToggle />
             <Button
               variant="ghost"
@@ -116,11 +129,15 @@ const Header: React.FC = () => {
               {user ? (
                 <>
                   <span className="px-4 py-2 text-sm text-muted-foreground">Welcome, {user.email}</span>
+                  <Link to="/my-bookings" className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors flex items-center" onClick={() => setIsOpen(false)}>
+                    My Bookings
+                  </Link>
+                  <Link to="/messages" className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors flex items-center" onClick={() => setIsOpen(false)}>
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Messages
+                  </Link>
                   <Link to="/settings" className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors" onClick={() => setIsOpen(false)}>
                     My Settings
-                  </Link>
-                  <Link to="/my-bookings" className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors" onClick={() => setIsOpen(false)}>
-                    My Bookings
                   </Link>
                   <Link to="/dashboard" className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors" onClick={() => setIsOpen(false)}>
                     My Dashboard
