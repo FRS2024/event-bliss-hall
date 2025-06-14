@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User as UserIcon, Settings, Calendar, LayoutDashboard, LogOut, MessageCircle } from 'lucide-react';
@@ -106,7 +105,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ onSignOut }) => {
           </DropdownMenuItem>
         ) : (
           <DropdownMenuItem asChild>
-            <Link to="/messages" className="flex items-center">
+            <Link to="/dashboard/messages" className="flex items-center">
               <MessageCircle className="mr-2 h-4 w-4" />
               <span>My Messages</span>
             </Link>
