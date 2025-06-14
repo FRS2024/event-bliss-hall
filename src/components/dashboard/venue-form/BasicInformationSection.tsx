@@ -20,6 +20,8 @@ interface VenueFormData {
   pricePerHour?: number;
   pricePerDay?: number;
   pricePerEvent?: number;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface BasicInformationSectionProps {
