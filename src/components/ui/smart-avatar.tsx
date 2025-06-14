@@ -20,6 +20,7 @@ const SmartAvatar: React.FC<SmartAvatarProps> = ({
 }) => {
   const [imageError, setImageError] = React.useState(false);
   const [imageLoaded, setImageLoaded] = React.useState(false);
+  const [currentSrc, setCurrentSrc] = React.useState(src);
 
   const sizeClasses = {
     sm: 'h-8 w-8 text-xs',
@@ -37,41 +38,53 @@ const SmartAvatar: React.FC<SmartAvatarProps> = ({
     return text.slice(0, 2).toUpperCase();
   };
 
-  // Debug logging
+  // Reset error state and update src when src prop changes
   React.useEffect(() => {
-    console.log('🎨 SmartAvatar - src:', src);
-    console.log('🎨 SmartAvatar - fallbackText:', fallbackText);
-    console.log('🎨 SmartAvatar - imageError:', imageError);
-    console.log('🎨 SmartAvatar - imageLoaded:', imageLoaded);
-  }, [src, fallbackText, imageError, imageLoaded]);
-
-  // Reset error state when src changes
-  React.useEffect(() => {
-    if (src) {
+    if (src !== currentSrc) {
+      console.log('🔄 SmartAvatar src changed:', { old: currentSrc, new: src });
+      setCurrentSrc(src);
       setImageError(false);
       setImageLoaded(false);
     }
-  }, [src]);
+  }, [src, currentSrc]);
+
+  // Debug logging
+  React.useEffect(() => {
+    console.log('🎨 SmartAvatar state:', {
+      src: currentSrc,
+      fallbackText,
+      imageError,
+      imageLoaded
+    });
+  }, [currentSrc, fallbackText, imageError, imageLoaded]);
 
   const handleImageError = () => {
-    console.log('❌ SmartAvatar - Image failed to load:', src);
+    console.log('❌ SmartAvatar - Image failed to load:', currentSrc);
     setImageError(true);
+    setImageLoaded(false);
   };
 
   const handleImageLoad = () => {
-    console.log('✅ SmartAvatar - Image loaded successfully:', src);
+    console.log('✅ SmartAvatar - Image loaded successfully:', currentSrc);
     setImageLoaded(true);
     setImageError(false);
   };
 
+  // Add cache-busting key to force re-render when src changes
+  const avatarKey = React.useMemo(() => {
+    return currentSrc ? `${currentSrc}-${Date.now()}` : 'no-image';
+  }, [currentSrc]);
+
   return (
-    <Avatar className={cn(sizeClasses[size], className)}>
-      {src && !imageError && (
+    <Avatar key={avatarKey} className={cn(sizeClasses[size], className)}>
+      {currentSrc && !imageError && (
         <AvatarImage 
-          src={src} 
+          src={currentSrc} 
           alt={alt}
           onError={handleImageError}
           onLoad={handleImageLoad}
+          // Force reload by adding key
+          key={currentSrc}
         />
       )}
       <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
