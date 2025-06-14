@@ -3,10 +3,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Send } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { ArrowLeft, Send, MapPin, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
@@ -71,7 +71,6 @@ const MessageThread: React.FC = () => {
 
       if (error) throw error;
 
-      // Update conversation timestamp
       await supabase
         .from('conversations')
         .update({ updated_at: new Date().toISOString() })
@@ -100,7 +99,7 @@ const MessageThread: React.FC = () => {
 
   if (!conversation) {
     return (
-      <div className="flex items-center justify-center p-8">
+      <div className="flex items-center justify-center h-full">
         <div className="text-lg">Loading conversation...</div>
       </div>
     );
@@ -110,98 +109,110 @@ const MessageThread: React.FC = () => {
   const otherPartyName = isHost ? 'Guest' : 'Host';
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-4">
-        <Button variant="outline" onClick={() => navigate('/dashboard/messages')}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Messages
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold">Conversation with {otherPartyName}</h1>
-          <p className="text-gray-600">Re: {conversation.venues?.name}</p>
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+        <div className="flex items-center space-x-3">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => navigate('/dashboard/messages')}
+            className="lg:hidden"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          
+          <Avatar className="h-10 w-10">
+            <AvatarFallback className={`
+              text-white font-semibold
+              ${isHost ? 'bg-green-500' : 'bg-blue-500'}
+            `}>
+              {isHost ? 'G' : 'H'}
+            </AvatarFallback>
+          </Avatar>
+          
+          <div>
+            <h2 className="font-semibold text-gray-900 dark:text-white">{otherPartyName}</h2>
+            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+              <MapPin className="h-3 w-3 mr-1" />
+              <span>{conversation.venues?.name} • {conversation.venues?.city}</span>
+            </div>
+          </div>
+        </div>
+
+        {conversation.bookings && (
+          <div className="flex items-center text-sm text-blue-600 dark:text-blue-400">
+            <Calendar className="h-4 w-4 mr-1" />
+            <span>Booking: {new Date(conversation.bookings.event_date).toLocaleDateString()}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-gray-800">
+        <div className="space-y-4 max-w-4xl mx-auto">
+          {messages?.map((message) => {
+            const isOwn = message.sender_id === user?.id;
+            return (
+              <div
+                key={message.id}
+                className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+              >
+                <div className={`flex items-end space-x-2 max-w-xs lg:max-w-md ${isOwn ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                  <Avatar className="h-8 w-8 flex-shrink-0">
+                    <AvatarFallback className={`
+                      text-white text-sm font-medium
+                      ${isOwn 
+                        ? (isHost ? 'bg-green-500' : 'bg-blue-500')
+                        : (isHost ? 'bg-blue-500' : 'bg-green-500')
+                      }
+                    `}>
+                      {isOwn ? (isHost ? 'H' : 'G') : (isHost ? 'G' : 'H')}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  <div className={`
+                    px-4 py-2 rounded-2xl shadow-sm
+                    ${isOwn 
+                      ? 'bg-blue-500 text-white rounded-br-md' 
+                      : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-bl-md border'
+                    }
+                  `}>
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <p className={`text-xs mt-1 ${isOwn ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                      {format(new Date(message.created_at), 'h:mm a')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          <div ref={messagesEndRef} />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3">
-          <Card className="h-[600px] flex flex-col">
-            <CardHeader>
-              <CardTitle>Messages</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
-              <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-                {messages?.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                        message.sender_id === user?.id
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-gray-100 text-gray-900'
-                      }`}
-                    >
-                      <p className="text-sm">{message.content}</p>
-                      <p className="text-xs opacity-70 mt-1">
-                        {format(new Date(message.created_at), 'MMM d, h:mm a')}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
-              
-              <div className="flex space-x-2">
-                <Textarea
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type your message..."
-                  className="flex-1"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSendMessage();
-                    }
-                  }}
-                />
-                <Button 
-                  onClick={handleSendMessage}
-                  disabled={!newMessage.trim() || sendMessageMutation.isPending}
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Venue Details</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <h3 className="font-semibold">{conversation.venues?.name}</h3>
-              <p className="text-sm text-gray-600">{conversation.venues?.city}</p>
-            </CardContent>
-          </Card>
-
-          {conversation.bookings && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Booking Details</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm">
-                  <strong>Date:</strong> {new Date(conversation.bookings.event_date).toLocaleDateString()}
-                </p>
-                <p className="text-sm">
-                  <strong>Guests:</strong> {conversation.bookings.guest_count}
-                </p>
-              </CardContent>
-            </Card>
-          )}
+      {/* Message Input */}
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+        <div className="flex items-end space-x-2 max-w-4xl mx-auto">
+          <Textarea
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type a message..."
+            className="flex-1 min-h-[44px] max-h-32 resize-none rounded-full px-4 py-3 border-gray-300 dark:border-gray-600"
+            onKeyPress={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
+          />
+          <Button 
+            onClick={handleSendMessage}
+            disabled={!newMessage.trim() || sendMessageMutation.isPending}
+            className="rounded-full h-11 w-11 p-0"
+          >
+            <Send className="h-4 w-4" />
+          </Button>
         </div>
       </div>
     </div>

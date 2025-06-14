@@ -7,13 +7,11 @@ import BookingsManagement from './BookingsManagement';
 import MessagesView from './MessagesView';
 import DashboardSettings from './DashboardSettings';
 import VenueAvailability from './VenueAvailability';
-import MessageThread from '../messaging/MessageThread';
 import { useUserRole } from '@/hooks/useUserRole';
 
 const DashboardContent: React.FC = () => {
   const userRole = useUserRole();
 
-  // Show loading state while determining user role
   if (userRole === 'loading') {
     return (
       <div className="p-6">
@@ -24,7 +22,6 @@ const DashboardContent: React.FC = () => {
     );
   }
 
-  // Component to protect host-only routes
   const HostOnlyRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     if (userRole !== 'host') {
       return <Navigate to="/dashboard/bookings" replace />;
@@ -32,7 +29,6 @@ const DashboardContent: React.FC = () => {
     return <>{children}</>;
   };
 
-  // Default route based on user role
   const getDefaultRoute = () => {
     return userRole === 'host' ? <DashboardOverview /> : <Navigate to="/dashboard/bookings" replace />;
   };
@@ -50,8 +46,7 @@ const DashboardContent: React.FC = () => {
           } 
         />
         <Route path="bookings" element={<BookingsManagement />} />
-        <Route path="messages" element={<MessagesView />} />
-        <Route path="messages/:conversationId" element={<MessageThread />} />
+        <Route path="messages/*" element={<MessagesView />} />
         <Route 
           path="venues/:venueId/availability" 
           element={

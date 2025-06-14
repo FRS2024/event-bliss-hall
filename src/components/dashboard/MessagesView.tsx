@@ -1,6 +1,6 @@
 
 import React from 'react';
-import MessagesList from '../messaging/MessagesList';
+import ChatLayout from '../messaging/ChatLayout';
 import { useUserRole } from '@/hooks/useUserRole';
 
 const MessagesView: React.FC = () => {
@@ -18,7 +18,7 @@ const MessagesView: React.FC = () => {
         </p>
       </div>
 
-      <MessagesList />
+      <ChatLayout />
     </div>
   );
 };
