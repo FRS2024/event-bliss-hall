@@ -103,9 +103,9 @@ const CategoriesPage: React.FC = () => {
           </h2>
           
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {Array.from({ length: 8 }).map((_, index) => (
-                <div key={index} className="venue-card animate-pulse w-full max-w-sm">
+                <div key={index} className="venue-card animate-pulse">
                   <div className="bg-gray-200 dark:bg-gray-700 h-48 w-full rounded-t-lg" />
                   <div className="p-6">
                     <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2" />
@@ -116,20 +116,19 @@ const CategoriesPage: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredCategories.map((category) => {
                 const stats = getCategoryStats(category);
                 return (
-                  <div key={category} className="w-full max-w-sm">
-                    <CategoryCard 
-                      category={category}
-                      venueCount={stats.count}
-                      priceRange={stats.minPrice > 0 && stats.maxPrice > 0 ? 
-                        `${stats.minPrice} - ${stats.maxPrice} DA` : 
-                        'Contact for pricing'
-                      }
-                    />
-                  </div>
+                  <CategoryCard 
+                    key={category} 
+                    category={category}
+                    venueCount={stats.count}
+                    priceRange={stats.minPrice > 0 && stats.maxPrice > 0 ? 
+                      `${stats.minPrice} - ${stats.maxPrice} DA` : 
+                      'Contact for pricing'
+                    }
+                  />
                 );
               })}
             </div>
