@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { MessageCircle, Calendar, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -73,8 +74,33 @@ const MessagesList: React.FC = () => {
     );
   }
 
+  const getInitials = (isHost: boolean) => {
+    return isHost ? 'H' : 'G';
+  };
+
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+    
+    if (diffInHours < 24) {
+      return date.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+      });
+    } else if (diffInHours < 168) { // Less than a week
+      return date.toLocaleDateString('en-US', { weekday: 'short' });
+    } else {
+      return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric' 
+      });
+    }
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {conversations.map((conversation) => {
         const lastMessage = conversation.messages?.[conversation.messages.length - 1];
         const unreadCount = conversation.messages?.filter(
@@ -83,58 +109,72 @@ const MessagesList: React.FC = () => {
         
         const isHost = conversation.host_id === user?.id;
         const otherPartyName = isHost ? 'Guest' : 'Host';
+        const hasUnread = unreadCount > 0;
 
         return (
-          <Card key={conversation.id} className="hover:shadow-md transition-shadow cursor-pointer">
-            <Link to={`/dashboard/messages/${conversation.id}`}>
-              <CardContent className="p-4">
-                <div className="flex justify-between items-start mb-2">
+          <Link 
+            key={conversation.id} 
+            to={`/dashboard/messages/${conversation.id}`}
+            className="block"
+          >
+            <div className={`
+              flex items-center p-4 rounded-lg transition-all duration-200 cursor-pointer
+              hover:bg-gray-50 dark:hover:bg-gray-800/50
+              ${hasUnread ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-white dark:bg-gray-900'}
+              border border-gray-200 dark:border-gray-700
+            `}>
+              {/* Avatar */}
+              <Avatar className="h-12 w-12 mr-4 flex-shrink-0">
+                <AvatarFallback className={`
+                  text-white font-semibold
+                  ${isHost ? 'bg-green-500' : 'bg-blue-500'}
+                `}>
+                  {getInitials(!isHost)}
+                </AvatarFallback>
+              </Avatar>
+
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center space-x-2">
-                    <h3 className="font-semibold">{otherPartyName}</h3>
+                    <h3 className={`font-medium text-gray-900 dark:text-white ${hasUnread ? 'font-semibold' : ''}`}>
+                      {otherPartyName}
+                    </h3>
                     {unreadCount > 0 && (
-                      <Badge variant="destructive" className="text-xs">
+                      <Badge variant="destructive" className="text-xs px-2 py-0.5 min-w-[20px] h-5 flex items-center justify-center">
                         {unreadCount}
                       </Badge>
                     )}
                   </div>
-                  <span className="text-sm text-gray-500">
-                    {conversation.venues && (
-                      <div className="flex items-center text-xs">
-                        <MapPin className="h-3 w-3 mr-1" />
-                        {conversation.venues.city}
-                      </div>
-                    )}
+                  <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+                    {lastMessage && formatTimestamp(lastMessage.created_at)}
                   </span>
                 </div>
                 
                 <div className="mb-2">
-                  <h4 className="text-sm font-medium text-gray-700">
-                    Re: {conversation.venues?.name || 'Venue Inquiry'}
-                  </h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center">
+                    <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+                    {conversation.venues?.name || 'Venue Inquiry'} • {conversation.venues?.city}
+                  </p>
                 </div>
                 
                 {lastMessage && (
-                  <p className="text-sm text-gray-600 line-clamp-2">
+                  <p className={`text-sm text-gray-600 dark:text-gray-400 truncate ${hasUnread ? 'font-medium text-gray-900 dark:text-white' : ''}`}>
                     {lastMessage.content}
                   </p>
                 )}
                 
-                <div className="flex justify-between items-center mt-3">
-                  <span className="text-xs text-gray-500">
-                    {conversation.booking_id && (
-                      <div className="flex items-center">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        Booking inquiry
-                      </div>
-                    )}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {lastMessage && new Date(lastMessage.created_at).toLocaleDateString()}
-                  </span>
-                </div>
-              </CardContent>
-            </Link>
-          </Card>
+                {conversation.booking_id && (
+                  <div className="flex items-center mt-2">
+                    <Calendar className="h-3 w-3 mr-1 text-blue-500" />
+                    <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                      Booking inquiry
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </Link>
         );
       })}
     </div>
