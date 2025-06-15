@@ -2,6 +2,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 
+console.log("Edge function loaded - send-contact-email");
+
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
@@ -17,15 +19,64 @@ interface ContactFormData {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  console.log("Function invoked with method:", req.method);
+  console.log("Request URL:", req.url);
+  
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
+    console.log("Handling CORS preflight request");
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { name, email, subject, message }: ContactFormData = await req.json();
+    console.log("Processing POST request");
+    
+    // Check if RESEND_API_KEY is available
+    const apiKey = Deno.env.get("RESEND_API_KEY");
+    if (!apiKey) {
+      console.error("RESEND_API_KEY is not configured");
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: "Email service not configured" 
+        }),
+        {
+          status: 500,
+          headers: { 
+            "Content-Type": "application/json", 
+            ...corsHeaders 
+          },
+        }
+      );
+    }
+    
+    console.log("RESEND_API_KEY is configured");
 
-    console.log("Sending contact email:", { name, email, subject });
+    const requestBody = await req.text();
+    console.log("Raw request body:", requestBody);
+    
+    const { name, email, subject, message }: ContactFormData = JSON.parse(requestBody);
+    console.log("Parsed contact form data:", { name, email, subject, messageLength: message.length });
+
+    // Validate required fields
+    if (!name || !email || !subject || !message) {
+      console.error("Missing required fields:", { name: !!name, email: !!email, subject: !!subject, message: !!message });
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: "All fields are required" 
+        }),
+        {
+          status: 400,
+          headers: { 
+            "Content-Type": "application/json", 
+            ...corsHeaders 
+          },
+        }
+      );
+    }
+
+    console.log("Sending admin notification email...");
 
     // Send notification email to admin
     const adminEmailResponse = await resend.emails.send({
@@ -43,6 +94,15 @@ const handler = async (req: Request): Promise<Response> => {
         <p><em>Reply to: ${email}</em></p>
       `,
     });
+
+    console.log("Admin email response:", adminEmailResponse);
+
+    if (adminEmailResponse.error) {
+      console.error("Admin email failed:", adminEmailResponse.error);
+      throw new Error(`Failed to send admin email: ${adminEmailResponse.error.message}`);
+    }
+
+    console.log("Sending user confirmation email...");
 
     // Send confirmation email to user
     const userEmailResponse = await resend.emails.send({
@@ -64,12 +124,19 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Emails sent successfully:", { adminEmailResponse, userEmailResponse });
+    console.log("User email response:", userEmailResponse);
+
+    if (userEmailResponse.error) {
+      console.error("User email failed:", userEmailResponse.error);
+      throw new Error(`Failed to send confirmation email: ${userEmailResponse.error.message}`);
+    }
+
+    console.log("Both emails sent successfully");
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Email sent successfully",
+        message: "Emails sent successfully",
         adminEmailId: adminEmailResponse.data?.id,
         userEmailId: userEmailResponse.data?.id
       }),
@@ -83,10 +150,13 @@ const handler = async (req: Request): Promise<Response> => {
     );
   } catch (error: any) {
     console.error("Error in send-contact-email function:", error);
+    console.error("Error stack:", error.stack);
+    
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message || "Failed to send email" 
+        error: error.message || "Failed to send email",
+        details: error.stack
       }),
       {
         status: 500,
@@ -99,4 +169,5 @@ const handler = async (req: Request): Promise<Response> => {
   }
 };
 
+console.log("Starting server...");
 serve(handler);
