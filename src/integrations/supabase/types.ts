@@ -9,6 +9,118 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_sessions: {
+        Row: {
+          admin_id: string
+          id: string
+          ip_address: unknown | null
+          is_active: boolean | null
+          login_at: string
+          logout_at: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          admin_id: string
+          id?: string
+          ip_address?: unknown | null
+          is_active?: boolean | null
+          login_at?: string
+          logout_at?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          admin_id?: string
+          id?: string
+          ip_address?: unknown | null
+          is_active?: boolean | null
+          login_at?: string
+          logout_at?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_sessions_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_users: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean | null
+          permissions: Json | null
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          permissions?: Json | null
+          role: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          permissions?: Json | null
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      announcements: {
+        Row: {
+          admin_id: string
+          content: string
+          created_at: string
+          id: string
+          is_published: boolean | null
+          sent_at: string | null
+          target_audience: string | null
+          target_users: string[] | null
+          title: string
+        }
+        Insert: {
+          admin_id: string
+          content: string
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          sent_at?: string | null
+          target_audience?: string | null
+          target_users?: string[] | null
+          title: string
+        }
+        Update: {
+          admin_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          sent_at?: string | null
+          target_audience?: string | null
+          target_users?: string[] | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcements_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           created_at: string
@@ -146,6 +258,53 @@ export type Database = {
           },
         ]
       }
+      flagged_content: {
+        Row: {
+          admin_id: string | null
+          content_id: string
+          content_type: string
+          created_at: string
+          description: string | null
+          flagged_by: string | null
+          id: string
+          reason: string
+          resolved_at: string | null
+          status: string | null
+        }
+        Insert: {
+          admin_id?: string | null
+          content_id: string
+          content_type: string
+          created_at?: string
+          description?: string | null
+          flagged_by?: string | null
+          id?: string
+          reason: string
+          resolved_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          admin_id?: string | null
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          description?: string | null
+          flagged_by?: string | null
+          id?: string
+          reason?: string
+          resolved_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flagged_content_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
@@ -181,6 +340,33 @@ export type Database = {
           },
         ]
       }
+      platform_metrics: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json | null
+          metric_date: string
+          metric_name: string
+          metric_value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          metric_date: string
+          metric_name: string
+          metric_value: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          metric_date?: string
+          metric_name?: string
+          metric_value?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -211,6 +397,92 @@ export type Database = {
           id?: string
           phone?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          admin_notes: string | null
+          assigned_to: string | null
+          category: string | null
+          content: string
+          created_at: string
+          id: string
+          priority: string | null
+          resolved_at: string | null
+          status: string | null
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          assigned_to?: string | null
+          category?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          priority?: string | null
+          resolved_at?: string | null
+          status?: string | null
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          assigned_to?: string | null
+          category?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          priority?: string | null
+          resolved_at?: string | null
+          status?: string | null
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_activities: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          resource_id: string | null
+          resource_type: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -375,7 +647,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_admin_role: {
+        Args: { user_id: string }
+        Returns: string
+      }
+      is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
