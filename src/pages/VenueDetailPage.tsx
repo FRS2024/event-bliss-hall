@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -10,7 +9,7 @@ import { MapPin, Users, Star } from 'lucide-react';
 import VenueActions from '@/components/venues/VenueActions';
 import VenueReviewsAndComments from '@/components/venues/VenueReviewsAndComments';
 
-const VenueDetailPage: React.FC = () =>
+const VenueDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   
   const { data: venue, isLoading, error } = useQuery({
