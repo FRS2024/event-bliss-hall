@@ -42,25 +42,40 @@ const VenuePendingApproval: React.FC = () => {
     queryFn: async () => {
       console.log('Fetching pending venues...');
 
-      const { data, error } = await supabase
+      const { data: venuesData, error: venuesError } = await supabase
         .from('venues')
-        .select(`
-          *,
-          profiles!venues_host_id_fkey(full_name, business_name, avatar_url),
-          venue_images(image_url, is_primary)
-        `)
+        .select('*')
         .eq('is_active', false)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching pending venues:', error);
-        throw error;
+      if (venuesError) {
+        console.error('Error fetching pending venues:', venuesError);
+        throw venuesError;
       }
 
-      return data.map(venue => ({
-        ...venue,
-        host_profile: venue.profiles
-      })) as PendingVenue[];
+      // Get host profiles and venue images for each venue
+      const venuesWithDetails = await Promise.all(
+        venuesData.map(async (venue) => {
+          const { data: hostProfile } = await supabase
+            .from('profiles')
+            .select('full_name, business_name, avatar_url')
+            .eq('id', venue.host_id)
+            .single();
+
+          const { data: venueImages } = await supabase
+            .from('venue_images')
+            .select('image_url, is_primary')
+            .eq('venue_id', venue.id);
+
+          return {
+            ...venue,
+            host_profile: hostProfile || { full_name: null, business_name: null, avatar_url: null },
+            venue_images: venueImages || []
+          };
+        })
+      );
+
+      return venuesWithDetails as PendingVenue[];
     },
     enabled: hasPermission(['super_admin', 'platform_manager']),
   });

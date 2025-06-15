@@ -29,29 +29,44 @@ const GuestUsers: React.FC = () => {
     queryFn: async () => {
       console.log('Fetching guest users...');
 
-      const { data, error } = await supabase
+      // First get profiles that are guests (no business_name)
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select(`
-          *,
-          bookings!bookings_guest_id_fkey(count, created_at)
-        `)
+        .select('*')
         .ilike('full_name', `%${searchTerm}%`)
         .is('business_name', null)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching guests:', error);
-        throw error;
+      if (profilesError) {
+        console.error('Error fetching guest profiles:', profilesError);
+        throw profilesError;
       }
 
-      // Transform the data to include booking stats
-      const transformedData = data.map(profile => ({
-        ...profile,
-        booking_count: profile.bookings?.[0]?.count || 0,
-        last_booking: profile.bookings?.[0]?.created_at || null
-      }));
+      // Then get booking counts for each profile
+      const guestProfiles = await Promise.all(
+        profilesData.map(async (profile) => {
+          const { count: bookingCount } = await supabase
+            .from('bookings')
+            .select('*', { count: 'exact', head: true })
+            .eq('guest_id', profile.id);
 
-      return transformedData as GuestProfile[];
+          const { data: lastBooking } = await supabase
+            .from('bookings')
+            .select('created_at')
+            .eq('guest_id', profile.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          return {
+            ...profile,
+            booking_count: bookingCount || 0,
+            last_booking: lastBooking?.created_at || null
+          };
+        })
+      );
+
+      return guestProfiles as GuestProfile[];
     },
     enabled: hasPermission(['super_admin', 'platform_manager']),
   });

@@ -40,36 +40,50 @@ const ActiveVenues: React.FC = () => {
     queryFn: async () => {
       console.log('Fetching active venues...');
 
-      let query = supabase
+      let venuesQuery = supabase
         .from('venues')
-        .select(`
-          *,
-          profiles!venues_host_id_fkey(full_name, business_name),
-          bookings!bookings_venue_id_fkey(count)
-        `)
+        .select('*')
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
       if (searchTerm) {
-        query = query.ilike('name', `%${searchTerm}%`);
+        venuesQuery = venuesQuery.ilike('name', `%${searchTerm}%`);
       }
 
       if (categoryFilter !== 'all') {
-        query = query.eq('category', categoryFilter);
+        venuesQuery = venuesQuery.eq('category', categoryFilter);
       }
 
-      const { data, error } = await query;
+      const { data: venuesData, error: venuesError } = await venuesQuery;
 
-      if (error) {
-        console.error('Error fetching active venues:', error);
-        throw error;
+      if (venuesError) {
+        console.error('Error fetching active venues:', venuesError);
+        throw venuesError;
       }
 
-      return data.map(venue => ({
-        ...venue,
-        host_profile: venue.profiles,
-        booking_count: venue.bookings?.[0]?.count || 0
-      })) as ActiveVenue[];
+      // Get host profiles and booking counts for each venue
+      const venuesWithDetails = await Promise.all(
+        venuesData.map(async (venue) => {
+          const { data: hostProfile } = await supabase
+            .from('profiles')
+            .select('full_name, business_name')
+            .eq('id', venue.host_id)
+            .single();
+
+          const { count: bookingCount } = await supabase
+            .from('bookings')
+            .select('*', { count: 'exact', head: true })
+            .eq('venue_id', venue.id);
+
+          return {
+            ...venue,
+            host_profile: hostProfile || { full_name: null, business_name: null },
+            booking_count: bookingCount || 0
+          };
+        })
+      );
+
+      return venuesWithDetails as ActiveVenue[];
     },
     enabled: hasPermission(['super_admin', 'platform_manager']),
   });

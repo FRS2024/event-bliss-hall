@@ -32,31 +32,42 @@ const HostUsers: React.FC = () => {
     queryFn: async () => {
       console.log('Fetching host users...');
 
-      const { data, error } = await supabase
+      // First get profiles that are hosts (have business_name)  
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select(`
-          *,
-          venues!venues_host_id_fkey(count),
-          bookings!bookings_host_id_fkey(count)
-        `)
+        .select('*')
         .ilike('business_name', `%${searchTerm}%`)
         .not('business_name', 'is', null)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching hosts:', error);
-        throw error;
+      if (profilesError) {
+        console.error('Error fetching host profiles:', profilesError);
+        throw profilesError;
       }
 
-      // Transform the data to include counts
-      const transformedData = data.map(profile => ({
-        ...profile,
-        venue_count: profile.venues?.[0]?.count || 0,
-        total_bookings: profile.bookings?.[0]?.count || 0,
-        is_verified: !!profile.business_name
-      }));
+      // Then get venue and booking counts for each profile
+      const hostProfiles = await Promise.all(
+        profilesData.map(async (profile) => {
+          const { count: venueCount } = await supabase
+            .from('venues')
+            .select('*', { count: 'exact', head: true })
+            .eq('host_id', profile.id);
 
-      return transformedData as HostProfile[];
+          const { count: bookingCount } = await supabase
+            .from('bookings')
+            .select('*', { count: 'exact', head: true })
+            .eq('host_id', profile.id);
+
+          return {
+            ...profile,
+            venue_count: venueCount || 0,
+            total_bookings: bookingCount || 0,
+            is_verified: !!profile.business_name
+          };
+        })
+      );
+
+      return hostProfiles as HostProfile[];
     },
     enabled: hasPermission(['super_admin', 'platform_manager']),
   });
