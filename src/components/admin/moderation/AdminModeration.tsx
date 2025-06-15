@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -31,10 +30,10 @@ interface FlaggedReview {
   profiles?: {
     full_name: string | null;
     avatar_url: string | null;
-  };
+  } | null;
   venues?: {
     name: string;
-  };
+  } | null;
 }
 
 interface FlaggedComment {
@@ -48,10 +47,10 @@ interface FlaggedComment {
   profiles?: {
     full_name: string | null;
     avatar_url: string | null;
-  };
+  } | null;
   venues?: {
     name: string;
-  };
+  } | null;
 }
 
 interface FlaggedReply {
@@ -64,12 +63,12 @@ interface FlaggedReply {
   profiles?: {
     full_name: string | null;
     avatar_url: string | null;
-  };
+  } | null;
   venue_comments?: {
     venues?: {
       name: string;
-    };
-  };
+    } | null;
+  } | null;
 }
 
 const AdminModeration: React.FC = () => {

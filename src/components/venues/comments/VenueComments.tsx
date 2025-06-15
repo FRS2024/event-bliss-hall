@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -143,7 +144,7 @@ const VenueComments: React.FC<VenueCommentsProps> = ({ venueId }) => {
           user_id,
           booking_id,
           is_flagged,
-          profiles!venue_comments_user_id_fkey (
+          profiles:user_id (
             full_name,
             avatar_url
           ),
@@ -153,7 +154,7 @@ const VenueComments: React.FC<VenueCommentsProps> = ({ venueId }) => {
             created_at,
             user_id,
             is_flagged,
-            profiles!comment_replies_user_id_fkey (
+            profiles:user_id (
               full_name,
               avatar_url
             )
