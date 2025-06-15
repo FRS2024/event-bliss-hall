@@ -8,14 +8,12 @@ import { Search, MessageCircle } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
-import { useTranslation } from 'react-i18next';
 import SmartAvatar from '@/components/ui/smart-avatar';
 
 const ChatSidebar: React.FC = () => {
   const { user } = useAuth();
   const userRole = useUserRole();
   const { conversationId } = useParams();
-  const { t } = useTranslation();
 
   const { data: conversations, isLoading } = useQuery({
     queryKey: ['conversations', user?.id],
@@ -87,7 +85,7 @@ const ChatSidebar: React.FC = () => {
   if (isLoading || userRole === 'loading') {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-sm text-gray-500">{t('chat.loading')}</div>
+        <div className="text-sm text-gray-500">Loading conversations...</div>
       </div>
     );
   }
@@ -96,11 +94,11 @@ const ChatSidebar: React.FC = () => {
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('chat.title')}</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Messages</h2>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input 
-            placeholder={t('chat.search')}
+            placeholder="Search conversations..." 
             className="pl-10 bg-gray-50 dark:bg-gray-800 border-0"
           />
         </div>
@@ -111,11 +109,11 @@ const ChatSidebar: React.FC = () => {
         {!conversations || conversations.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full p-6 text-center">
             <MessageCircle className="h-12 w-12 text-gray-300 mb-4" />
-            <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2">{t('chat.noConversations')}</h3>
+            <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2">No conversations yet</h3>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {userRole === 'host' 
-                ? t('chat.noConversationsHost')
-                : t('chat.noConversationsGuest')
+                ? "Messages will appear when guests contact you"
+                : "Messages will appear when you contact hosts"
               }
             </p>
           </div>
@@ -130,8 +128,8 @@ const ChatSidebar: React.FC = () => {
               const isHost = conversation.host_id === user?.id;
               const otherUserProfile = conversation.otherUserProfile;
               const displayName = isHost 
-                ? (otherUserProfile?.full_name || t('chat.guest'))
-                : (otherUserProfile?.business_name || otherUserProfile?.full_name || t('chat.host'));
+                ? (otherUserProfile?.full_name || 'Guest')
+                : (otherUserProfile?.business_name || otherUserProfile?.full_name || 'Host');
               const isActive = conversationId === conversation.id;
 
               return (

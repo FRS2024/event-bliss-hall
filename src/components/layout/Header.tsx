@@ -52,7 +52,7 @@ const Header: React.FC = () => {
             <LanguageToggle />
             <ThemeToggle />
             {user ? (
-              <UserDropdown />
+              <UserDropdown onSignOut={handleSignOut} />
             ) : (
               <>
                 <Link to="/login">

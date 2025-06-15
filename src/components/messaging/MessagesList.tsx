@@ -10,12 +10,10 @@ import { MessageCircle, Calendar, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
-import { useTranslation } from 'react-i18next';
 
 const MessagesList: React.FC = () => {
   const { user } = useAuth();
   const userRole = useUserRole();
-  const { t } = useTranslation();
 
   const { data: conversations, isLoading } = useQuery({
     queryKey: ['conversations', user?.id],
@@ -47,7 +45,7 @@ const MessagesList: React.FC = () => {
   if (isLoading || userRole === 'loading') {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-lg">{t('chat.loading')}</div>
+        <div className="text-lg">Loading conversations...</div>
       </div>
     );
   }
@@ -59,16 +57,16 @@ const MessagesList: React.FC = () => {
       <Card>
         <CardContent className="text-center py-8">
           <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">{t('chat.noConversations')}</h3>
+          <h3 className="text-lg font-semibold mb-2">No conversations yet</h3>
           <p className="text-gray-600 mb-4">
             {isHost 
-              ? t('chat.noConversationsHost')
-              : t('chat.noConversationsGuest')
+              ? "Messages will appear here when guests contact you about your venues"
+              : "Messages will appear here when you contact hosts about venues"
             }
           </p>
           {!isHost && (
             <Button asChild variant="outline">
-              <Link to="/venues">{t('nav.venues')}</Link>
+              <Link to="/venues">Browse Venues</Link>
             </Button>
           )}
         </CardContent>
@@ -110,7 +108,7 @@ const MessagesList: React.FC = () => {
         ).length || 0;
         
         const isHost = conversation.host_id === user?.id;
-        const otherPartyName = isHost ? t('chat.guest') : t('chat.host');
+        const otherPartyName = isHost ? 'Guest' : 'Host';
         const hasUnread = unreadCount > 0;
 
         return (
@@ -156,7 +154,7 @@ const MessagesList: React.FC = () => {
                 <div className="mb-2">
                   <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center">
                     <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
-                    {conversation.venues?.name || t('chat.venueInquiry')} • {conversation.venues?.city}
+                    {conversation.venues?.name || 'Venue Inquiry'} • {conversation.venues?.city}
                   </p>
                 </div>
                 
@@ -170,7 +168,7 @@ const MessagesList: React.FC = () => {
                   <div className="flex items-center mt-2">
                     <Calendar className="h-3 w-3 mr-1 text-blue-500" />
                     <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                      {t('chat.bookingInquiry')}
+                      Booking inquiry
                     </span>
                   </div>
                 )}

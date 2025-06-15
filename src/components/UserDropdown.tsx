@@ -2,7 +2,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User as UserIcon, Settings, Calendar, LayoutDashboard, LogOut, MessageCircle } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,9 +16,12 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { useProfile } from '@/hooks/useProfile';
 import SmartAvatar from '@/components/ui/smart-avatar';
 
-const UserDropdown: React.FC = () => {
-  const { user, signOut } = useAuth();
-  const { t } = useTranslation();
+interface UserDropdownProps {
+  onSignOut: () => void;
+}
+
+const UserDropdown: React.FC<UserDropdownProps> = ({ onSignOut }) => {
+  const { user } = useAuth();
   const userRole = useUserRole();
   const { profile, isLoading: profileLoading } = useProfile();
   const navigate = useNavigate();
@@ -32,13 +34,9 @@ const UserDropdown: React.FC = () => {
     console.log('⏳ UserDropdown - Profile loading:', profileLoading);
   }, [profile, user, profileLoading]);
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      navigate('/');
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
+  const handleSignOut = () => {
+    onSignOut();
+    navigate('/');
   };
 
   // Show loading state while determining user role or loading profile
@@ -88,14 +86,14 @@ const UserDropdown: React.FC = () => {
         <DropdownMenuItem asChild>
           <Link to="/settings" className="flex items-center">
             <Settings className="mr-2 h-4 w-4" />
-            <span>{t('nav.mySettings')}</span>
+            <span>My Settings</span>
           </Link>
         </DropdownMenuItem>
         
         <DropdownMenuItem asChild>
           <Link to="/dashboard/bookings" className="flex items-center">
             <Calendar className="mr-2 h-4 w-4" />
-            <span>{t('nav.myBookings')}</span>
+            <span>My Bookings</span>
           </Link>
         </DropdownMenuItem>
         
@@ -103,14 +101,14 @@ const UserDropdown: React.FC = () => {
           <DropdownMenuItem asChild>
             <Link to="/dashboard" className="flex items-center">
               <LayoutDashboard className="mr-2 h-4 w-4" />
-              <span>{t('nav.myDashboard')}</span>
+              <span>Host Dashboard</span>
             </Link>
           </DropdownMenuItem>
         ) : (
           <DropdownMenuItem asChild>
             <Link to="/dashboard/messages" className="flex items-center">
               <MessageCircle className="mr-2 h-4 w-4" />
-              <span>{t('nav.messages')}</span>
+              <span>My Messages</span>
             </Link>
           </DropdownMenuItem>
         )}
@@ -118,7 +116,7 @@ const UserDropdown: React.FC = () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>{t('nav.logout')}</span>
+          <span>Log out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
