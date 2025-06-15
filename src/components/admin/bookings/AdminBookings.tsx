@@ -1,23 +1,21 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import AllBookings from './AllBookings';
+import BookingDisputes from './BookingDisputes';
+import BookingRevenue from './BookingRevenue';
+import BookingAnalytics from './BookingAnalytics';
 
 const AdminBookings: React.FC = () => {
   return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Booking Management</h1>
-        <p className="text-gray-600 dark:text-gray-400">Manage bookings and disputes</p>
-      </div>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>Booking Management Dashboard</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-600">Booking management interface coming soon...</p>
-        </CardContent>
-      </Card>
+    <div className="p-6">
+      <Routes>
+        <Route index element={<AllBookings />} />
+        <Route path="disputes" element={<BookingDisputes />} />
+        <Route path="revenue" element={<BookingRevenue />} />
+        <Route path="analytics" element={<BookingAnalytics />} />
+        <Route path="*" element={<Navigate to="/admin/bookings" replace />} />
+      </Routes>
     </div>
   );
 };
