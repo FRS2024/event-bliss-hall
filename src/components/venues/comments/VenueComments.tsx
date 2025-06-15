@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,7 +19,7 @@ interface Comment {
   profiles?: {
     full_name: string | null;
     avatar_url: string | null;
-  };
+  } | null;
   comment_replies?: Reply[];
 }
 
@@ -33,7 +32,7 @@ interface Reply {
   profiles?: {
     full_name: string | null;
     avatar_url: string | null;
-  };
+  } | null;
 }
 
 interface BookingEligibility {
@@ -144,7 +143,7 @@ const VenueComments: React.FC<VenueCommentsProps> = ({ venueId }) => {
           user_id,
           booking_id,
           is_flagged,
-          profiles:user_id (
+          profiles!venue_comments_user_id_fkey (
             full_name,
             avatar_url
           ),
@@ -154,7 +153,7 @@ const VenueComments: React.FC<VenueCommentsProps> = ({ venueId }) => {
             created_at,
             user_id,
             is_flagged,
-            profiles:user_id (
+            profiles!comment_replies_user_id_fkey (
               full_name,
               avatar_url
             )

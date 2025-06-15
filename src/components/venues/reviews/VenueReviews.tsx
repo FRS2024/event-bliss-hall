@@ -20,7 +20,7 @@ interface Review {
   profiles?: {
     full_name: string | null;
     avatar_url: string | null;
-  };
+  } | null;
 }
 
 interface VenueReviewsProps {
@@ -47,7 +47,7 @@ const VenueReviews: React.FC<VenueReviewsProps> = ({ venueId }) => {
           comment,
           created_at,
           user_id,
-          profiles:user_id (
+          profiles!venue_reviews_user_id_fkey (
             full_name,
             avatar_url
           )
