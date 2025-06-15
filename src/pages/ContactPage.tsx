@@ -4,6 +4,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { Mail, Phone, MapPin, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -12,24 +13,58 @@ const ContactPage: React.FC = () => {
     subject: '',
     message: ''
   });
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simulate form submission
-    toast({
-      title: "Message sent successfully!",
-      description: "We'll get back to you within 24 hours.",
-    });
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      toast({
+        title: "Missing fields",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
     
-    // Reset form
-    setFormData({
-      name: '',
-      email: '',
-      subject: '',
-      message: ''
-    });
+    try {
+      const { data, error } = await supabase.functions.invoke('send-contact-email', {
+        body: formData
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data?.success) {
+        toast({
+          title: "Message sent successfully!",
+          description: "We'll get back to you within 24 hours.",
+        });
+        
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: ''
+        });
+      } else {
+        throw new Error(data?.error || "Failed to send message");
+      }
+    } catch (error: any) {
+      console.error('Contact form error:', error);
+      toast({
+        title: "Failed to send message",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -110,7 +145,7 @@ const ContactPage: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Name</label>
+                  <label className="block text-sm font-medium mb-2">Name *</label>
                   <input
                     type="text"
                     name="name"
@@ -118,10 +153,11 @@ const ContactPage: React.FC = () => {
                     onChange={handleChange}
                     className="elegant-input"
                     required
+                    disabled={isLoading}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Email</label>
+                  <label className="block text-sm font-medium mb-2">Email *</label>
                   <input
                     type="email"
                     name="email"
@@ -129,12 +165,13 @@ const ContactPage: React.FC = () => {
                     onChange={handleChange}
                     className="elegant-input"
                     required
+                    disabled={isLoading}
                   />
                 </div>
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-2">Subject</label>
+                <label className="block text-sm font-medium mb-2">Subject *</label>
                 <input
                   type="text"
                   name="subject"
@@ -142,11 +179,12 @@ const ContactPage: React.FC = () => {
                   onChange={handleChange}
                   className="elegant-input"
                   required
+                  disabled={isLoading}
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-2">Message</label>
+                <label className="block text-sm font-medium mb-2">Message *</label>
                 <textarea
                   name="message"
                   value={formData.message}
@@ -154,14 +192,16 @@ const ContactPage: React.FC = () => {
                   rows={6}
                   className="elegant-input resize-none"
                   required
+                  disabled={isLoading}
                 ></textarea>
               </div>
               
               <Button 
                 type="submit" 
                 className="w-full bg-blush-400 hover:bg-blush-500 text-white"
+                disabled={isLoading}
               >
-                Send Message
+                {isLoading ? 'Sending...' : 'Send Message'}
               </Button>
             </form>
           </div>
