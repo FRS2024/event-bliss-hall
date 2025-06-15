@@ -84,10 +84,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Sending admin notification email...");
 
-    // Send notification email to admin
+    // Send notification email to admin (using verified email address)
     const adminEmailResponse = await resend.emails.send({
       from: "EasyHall Contact <onboarding@resend.dev>",
-      to: ["faresabdelbasset.boudra@gmail.com"],
+      to: ["boudra.fares20@gmail.com"], // Using your verified email address
       subject: `New Contact Form: ${subject}`,
       html: `
         <h2>New Contact Form Submission</h2>
