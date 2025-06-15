@@ -144,7 +144,7 @@ const VenueComments: React.FC<VenueCommentsProps> = ({ venueId }) => {
           user_id,
           booking_id,
           is_flagged,
-          profiles:user_id (
+          profiles!venue_comments_user_id_fkey (
             full_name,
             avatar_url
           ),
@@ -154,7 +154,7 @@ const VenueComments: React.FC<VenueCommentsProps> = ({ venueId }) => {
             created_at,
             user_id,
             is_flagged,
-            profiles:user_id (
+            profiles!comment_replies_user_id_fkey (
               full_name,
               avatar_url
             )

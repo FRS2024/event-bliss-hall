@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -72,7 +73,7 @@ interface FlaggedReply {
 }
 
 const AdminModeration: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('flagged-reviews');
+  const [activeTab, setActiveTab] = useState('flagge d-reviews');
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -89,11 +90,11 @@ const AdminModeration: React.FC = () => {
           created_at,
           user_id,
           venue_id,
-          profiles:user_id (
+          profiles!venue_reviews_user_id_fkey (
             full_name,
             avatar_url
           ),
-          venues:venue_id (
+          venues!venue_reviews_venue_id_fkey (
             name
           )
         `)
@@ -118,11 +119,11 @@ const AdminModeration: React.FC = () => {
           venue_id,
           booking_id,
           is_flagged,
-          profiles:user_id (
+          profiles!venue_comments_user_id_fkey (
             full_name,
             avatar_url
           ),
-          venues:venue_id (
+          venues!venue_comments_venue_id_fkey (
             name
           )
         `)
@@ -147,12 +148,12 @@ const AdminModeration: React.FC = () => {
           user_id,
           comment_id,
           is_flagged,
-          profiles:user_id (
+          profiles!comment_replies_user_id_fkey (
             full_name,
             avatar_url
           ),
-          venue_comments:comment_id (
-            venues:venue_id (
+          venue_comments!comment_replies_comment_id_fkey (
+            venues!venue_comments_venue_id_fkey (
               name
             )
           )
