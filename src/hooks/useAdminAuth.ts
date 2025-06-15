@@ -21,9 +21,13 @@ export const useAdminAuth = () => {
   const { data: adminUser, isLoading, error } = useQuery({
     queryKey: ['admin-auth', user?.id],
     queryFn: async () => {
-      if (!user) return null;
+      if (!user) {
+        console.log('❌ No user found for admin check');
+        return null;
+      }
 
-      console.log('Checking admin status for user:', user.id);
+      console.log('🔍 Checking admin status for user:', user.id);
+      console.log('📧 User email:', user.email);
 
       const { data, error } = await supabase
         .from('admin_users')
@@ -33,24 +37,45 @@ export const useAdminAuth = () => {
         .maybeSingle();
 
       if (error) {
-        console.error('Error checking admin status:', error);
+        console.error('❌ Error checking admin status:', error);
         throw error;
       }
 
-      console.log('Admin user data:', data);
+      console.log('✅ Admin user data:', data);
+      
+      if (data) {
+        console.log('🎉 User is admin with role:', data.role);
+      } else {
+        console.log('⚠️ User is not an admin');
+      }
+
       return data as AdminUser | null;
     },
     enabled: !!user,
+    retry: 1,
   });
 
   const isAdmin = !!adminUser;
   const adminRole = adminUser?.role || null;
 
+  console.log('🔑 Admin auth status:', { isAdmin, adminRole, isLoading, user: user?.email });
+
   const hasPermission = (requiredRole: AdminRole | AdminRole[]) => {
-    if (!adminUser) return false;
+    if (!adminUser) {
+      console.log('❌ No admin user for permission check');
+      return false;
+    }
     
     const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-    return roles.includes(adminUser.role);
+    const hasAccess = roles.includes(adminUser.role);
+    
+    console.log('🔐 Permission check:', { 
+      userRole: adminUser.role, 
+      requiredRoles: roles, 
+      hasAccess 
+    });
+    
+    return hasAccess;
   };
 
   return {

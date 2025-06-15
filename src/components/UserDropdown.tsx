@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User as UserIcon, Settings, Calendar, LayoutDashboard, LogOut, MessageCircle } from 'lucide-react';
+import { User as UserIcon, Settings, Calendar, LayoutDashboard, LogOut, MessageCircle, Shield } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useProfile } from '@/hooks/useProfile';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import SmartAvatar from '@/components/ui/smart-avatar';
 
 interface UserDropdownProps {
@@ -24,6 +25,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ onSignOut }) => {
   const { user } = useAuth();
   const userRole = useUserRole();
   const { profile, isLoading: profileLoading } = useProfile();
+  const { isAdmin } = useAdminAuth();
   const navigate = useNavigate();
 
   // Debug logging
@@ -32,7 +34,8 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ onSignOut }) => {
     console.log('🖼️ UserDropdown - Avatar URL:', profile?.avatar_url);
     console.log('👤 UserDropdown - User:', user?.email);
     console.log('⏳ UserDropdown - Profile loading:', profileLoading);
-  }, [profile, user, profileLoading]);
+    console.log('🔑 UserDropdown - Is admin:', isAdmin);
+  }, [profile, user, profileLoading, isAdmin]);
 
   const handleSignOut = () => {
     onSignOut();
@@ -111,6 +114,18 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ onSignOut }) => {
               <span>My Messages</span>
             </Link>
           </DropdownMenuItem>
+        )}
+
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link to="/admin" className="flex items-center">
+                <Shield className="mr-2 h-4 w-4" />
+                <span>Admin Dashboard</span>
+              </Link>
+            </DropdownMenuItem>
+          </>
         )}
         
         <DropdownMenuSeparator />

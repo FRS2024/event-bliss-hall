@@ -2,6 +2,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import MainLayout from '@/components/layout/MainLayout';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminContent from '@/components/admin/AdminContent';
@@ -9,9 +10,20 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const AdminDashboardPage: React.FC = () => {
-  const { isAdmin, isLoading, error } = useAdminAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { isAdmin, isLoading: adminLoading, error } = useAdminAuth();
 
-  if (isLoading) {
+  console.log('🎯 AdminDashboardPage render:', { 
+    user: user?.email, 
+    isAdmin, 
+    authLoading, 
+    adminLoading, 
+    error 
+  });
+
+  // Show loading while checking authentication
+  if (authLoading || adminLoading) {
+    console.log('⏳ Loading admin dashboard...');
     return (
       <MainLayout>
         <div className="flex items-center justify-center min-h-screen">
@@ -21,7 +33,15 @@ const AdminDashboardPage: React.FC = () => {
     );
   }
 
+  // Redirect to login if not authenticated
+  if (!user) {
+    console.log('🚪 No user, redirecting to login');
+    return <Navigate to="/login" replace />;
+  }
+
+  // Show error if there was an issue checking admin status
   if (error) {
+    console.error('💥 Admin auth error:', error);
     return (
       <MainLayout>
         <div className="flex items-center justify-center min-h-screen">
@@ -33,6 +53,9 @@ const AdminDashboardPage: React.FC = () => {
               <p className="text-gray-600">
                 Unable to verify admin access. Please contact support if you believe this is an error.
               </p>
+              <p className="text-sm text-gray-500 mt-2">
+                Error: {error.message}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -40,9 +63,13 @@ const AdminDashboardPage: React.FC = () => {
     );
   }
 
+  // Redirect if user is not an admin
   if (!isAdmin) {
+    console.log('🚫 User is not admin, redirecting to home');
     return <Navigate to="/" replace />;
   }
+
+  console.log('✅ Rendering admin dashboard for user:', user.email);
 
   return (
     <MainLayout>
