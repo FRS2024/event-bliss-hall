@@ -34,7 +34,7 @@ const App = () => (
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<EnhancedIndex />} />
+            <Route path="/" element={<Index />} />
             <Route path="/venues" element={<VenuesPage />} />
             <Route path="/venues/:id" element={<VenueDetailPage />} />
             <Route path="/categories" element={<CategoriesPage />} />

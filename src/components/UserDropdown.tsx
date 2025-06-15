@@ -17,12 +17,8 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { useProfile } from '@/hooks/useProfile';
 import SmartAvatar from '@/components/ui/smart-avatar';
 
-interface UserDropdownProps {
-  onSignOut: () => void;
-}
-
-const UserDropdown: React.FC<UserDropdownProps> = ({ onSignOut }) => {
-  const { user } = useAuth();
+const UserDropdown: React.FC = () => {
+  const { user, signOut } = useAuth();
   const { t } = useTranslation();
   const userRole = useUserRole();
   const { profile, isLoading: profileLoading } = useProfile();
@@ -36,9 +32,13 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ onSignOut }) => {
     console.log('⏳ UserDropdown - Profile loading:', profileLoading);
   }, [profile, user, profileLoading]);
 
-  const handleSignOut = () => {
-    onSignOut();
-    navigate('/');
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   // Show loading state while determining user role or loading profile
