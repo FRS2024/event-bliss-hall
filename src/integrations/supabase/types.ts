@@ -65,6 +65,42 @@ export type Database = {
           },
         ]
       }
+      contact_submissions: {
+        Row: {
+          admin_email_id: string | null
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          status: string | null
+          subject: string
+          user_email_id: string | null
+        }
+        Insert: {
+          admin_email_id?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          status?: string | null
+          subject: string
+          user_email_id?: string | null
+        }
+        Update: {
+          admin_email_id?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          status?: string | null
+          subject?: string
+          user_email_id?: string | null
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           booking_id: string | null
