@@ -1,3 +1,4 @@
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -29,33 +30,36 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <AuthProvider>
-      <QueryClient>
-        <Toaster />
-        <Router>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/venues" element={<VenuesPage />} />
-            <Route path="/venues/:id" element={<VenueDetailPage />} />
-            <Route path="/categories" element={<CategoriesPage />} />
-            <Route path="/categories/:category" element={<VenuesPage />} />
-            <Route path="/how-it-works" element={<HowItWorksPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/terms" element={<TermsOfServicePage />} />
-            <Route path="/privacy" element={<PrivacyPolicyPage />} />
-            <Route path="/cookies" element={<CookiePolicyPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/dashboard/*" element={<DashboardPage />} />
-            <Route path="/dashboard/venues/:id/edit" element={<EditVenuePage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/my-bookings" element={<MyBookingsPage />} />
-            <Route path="/messages/*" element={<MessagesPage />} />
-            <Route path="/admin/*" element={<AdminDashboardPage />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Router>
-      </QueryClient>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <Router>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/venues" element={<VenuesPage />} />
+              <Route path="/venues/:id" element={<VenueDetailPage />} />
+              <Route path="/categories" element={<CategoriesPage />} />
+              <Route path="/categories/:category" element={<VenuesPage />} />
+              <Route path="/how-it-works" element={<HowItWorksPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/terms" element={<TermsOfServicePage />} />
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
+              <Route path="/cookies" element={<CookiePolicyPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/dashboard/*" element={<DashboardPage />} />
+              <Route path="/dashboard/venues/:id/edit" element={<EditVenuePage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/my-bookings" element={<MyBookingsPage />} />
+              <Route path="/messages/*" element={<MessagesPage />} />
+              <Route path="/admin/*" element={<AdminDashboardPage />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Router>
+        </TooltipProvider>
+      </QueryClientProvider>
     </AuthProvider>
   );
 }
