@@ -20,6 +20,19 @@ export interface BookingWithDetails {
   host_business: string | null;
 }
 
+interface VenueData {
+  id: string;
+  name: string;
+  city: string;
+}
+
+interface ProfileData {
+  id: string;
+  full_name: string;
+  phone?: string;
+  business_name?: string;
+}
+
 export const useAllBookings = (searchTerm: string, statusFilter: string, hasPermission: boolean) => {
   return useQuery({
     queryKey: ['admin-all-bookings', searchTerm, statusFilter],
@@ -66,9 +79,14 @@ export const useAllBookings = (searchTerm: string, statusFilter: string, hasPerm
       ]);
 
       // Create lookup maps with proper typing
-      const venuesMap = new Map(venuesData.data?.map((v: any) => [v.id, v]) || []);
-      const guestsMap = new Map(guestsData.data?.map((g: any) => [g.id, g]) || []);
-      const hostsMap = new Map(hostsData.data?.map((h: any) => [h.id, h]) || []);
+      const venuesMap = new Map<string, VenueData>();
+      const guestsMap = new Map<string, ProfileData>();
+      const hostsMap = new Map<string, ProfileData>();
+
+      // Populate maps
+      venuesData.data?.forEach((v: VenueData) => venuesMap.set(v.id, v));
+      guestsData.data?.forEach((g: ProfileData) => guestsMap.set(g.id, g));
+      hostsData.data?.forEach((h: ProfileData) => hostsMap.set(h.id, h));
 
       // Combine data and apply search filter
       let result = bookingsData.map(booking => {

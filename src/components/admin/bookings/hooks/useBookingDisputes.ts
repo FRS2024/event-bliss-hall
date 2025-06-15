@@ -3,6 +3,27 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { DisputeData } from '../types';
 
+interface VenueData {
+  id: string;
+  name: string;
+}
+
+interface ProfileData {
+  id: string;
+  full_name: string;
+  business_name?: string;
+}
+
+interface BookingData {
+  id: string;
+  event_date: string;
+  total_price: number;
+  guest_count: number;
+  venue_id: string;
+  guest_id: string;
+  host_id: string;
+}
+
 export const useBookingDisputes = (searchTerm: string, hasPermission: boolean) => {
   return useQuery({
     queryKey: ['admin-booking-disputes', searchTerm],
@@ -85,10 +106,16 @@ export const useBookingDisputes = (searchTerm: string, hasPermission: boolean) =
       ]);
 
       // Create lookup maps with proper typing
-      const bookingsMap = new Map(bookingsData?.map(b => [b.id, b]) || []);
-      const venuesMap = new Map(venuesData.data?.map((v: any) => [v.id, v]) || []);
-      const guestsMap = new Map(guestsData.data?.map((g: any) => [g.id, g]) || []);
-      const hostsMap = new Map(hostsData.data?.map((h: any) => [h.id, h]) || []);
+      const bookingsMap = new Map<string, BookingData>();
+      const venuesMap = new Map<string, VenueData>();
+      const guestsMap = new Map<string, ProfileData>();
+      const hostsMap = new Map<string, ProfileData>();
+
+      // Populate maps
+      bookingsData?.forEach(b => bookingsMap.set(b.id, b));
+      venuesData.data?.forEach((v: VenueData) => venuesMap.set(v.id, v));
+      guestsData.data?.forEach((g: ProfileData) => guestsMap.set(g.id, g));
+      hostsData.data?.forEach((h: ProfileData) => hostsMap.set(h.id, h));
 
       // Combine data
       return flaggedData.map(dispute => {
