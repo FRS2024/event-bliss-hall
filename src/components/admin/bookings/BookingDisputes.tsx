@@ -21,22 +21,13 @@ interface DisputeData {
   resolved_at: string | null;
   flagged_by: string | null;
   admin_id: string | null;
-  booking: {
-    id: string;
-    event_date: string;
-    total_price: number;
-    guest_count: number;
-    venue: {
-      name: string;
-    } | null;
-    guest: {
-      full_name: string | null;
-    } | null;
-    host: {
-      full_name: string | null;
-      business_name: string | null;
-    } | null;
-  } | null;
+  booking_event_date: string | null;
+  booking_total_price: number | null;
+  booking_guest_count: number | null;
+  venue_name: string | null;
+  guest_name: string | null;
+  host_name: string | null;
+  host_business: string | null;
 }
 
 const BookingDisputes: React.FC = () => {
@@ -48,20 +39,10 @@ const BookingDisputes: React.FC = () => {
     queryFn: async () => {
       console.log('Fetching booking disputes...');
 
+      // First get flagged content for bookings
       let query = supabase
         .from('flagged_content')
-        .select(`
-          *,
-          booking:bookings!flagged_content_content_id_fkey(
-            id,
-            event_date,
-            total_price,
-            guest_count,
-            venue:venues(name),
-            guest:profiles!bookings_guest_id_fkey(full_name),
-            host:profiles!bookings_host_id_fkey(full_name, business_name)
-          )
-        `)
+        .select('*')
         .eq('content_type', 'booking')
         .order('created_at', { ascending: false });
 
@@ -69,25 +50,102 @@ const BookingDisputes: React.FC = () => {
         query = query.ilike('reason', `%${searchTerm}%`);
       }
 
-      const { data, error } = await query;
+      const { data: flaggedData, error: flaggedError } = await query;
 
-      if (error) {
-        console.error('Error fetching disputes:', error);
-        throw error;
+      if (flaggedError) {
+        console.error('Error fetching flagged content:', flaggedError);
+        throw flaggedError;
       }
 
-      return (data || []).map(dispute => ({
-        id: dispute.id,
-        content_id: dispute.content_id,
-        reason: dispute.reason,
-        description: dispute.description,
-        status: dispute.status,
-        created_at: dispute.created_at,
-        resolved_at: dispute.resolved_at,
-        flagged_by: dispute.flagged_by,
-        admin_id: dispute.admin_id,
-        booking: dispute.booking
-      })) as DisputeData[];
+      if (!flaggedData || flaggedData.length === 0) {
+        return [];
+      }
+
+      // Get all unique booking IDs
+      const bookingIds = [...new Set(flaggedData.map(f => f.content_id).filter(Boolean))];
+
+      if (bookingIds.length === 0) {
+        return flaggedData.map(dispute => ({
+          id: dispute.id,
+          content_id: dispute.content_id,
+          reason: dispute.reason,
+          description: dispute.description,
+          status: dispute.status,
+          created_at: dispute.created_at,
+          resolved_at: dispute.resolved_at,
+          flagged_by: dispute.flagged_by,
+          admin_id: dispute.admin_id,
+          booking_event_date: null,
+          booking_total_price: null,
+          booking_guest_count: null,
+          venue_name: null,
+          guest_name: null,
+          host_name: null,
+          host_business: null
+        }));
+      }
+
+      // Fetch booking data
+      const { data: bookingsData, error: bookingsError } = await supabase
+        .from('bookings')
+        .select('id, event_date, total_price, guest_count, venue_id, guest_id, host_id')
+        .in('id', bookingIds);
+
+      if (bookingsError) {
+        console.error('Error fetching bookings:', bookingsError);
+        throw bookingsError;
+      }
+
+      // Get all unique IDs for related data
+      const venueIds = [...new Set(bookingsData?.map(b => b.venue_id).filter(Boolean) || [])];
+      const guestIds = [...new Set(bookingsData?.map(b => b.guest_id).filter(Boolean) || [])];
+      const hostIds = [...new Set(bookingsData?.map(b => b.host_id).filter(Boolean) || [])];
+
+      // Fetch related data
+      const [venuesData, guestsData, hostsData] = await Promise.all([
+        venueIds.length > 0 
+          ? supabase.from('venues').select('id, name').in('id', venueIds)
+          : Promise.resolve({ data: [], error: null }),
+        guestIds.length > 0 
+          ? supabase.from('profiles').select('id, full_name').in('id', guestIds)
+          : Promise.resolve({ data: [], error: null }),
+        hostIds.length > 0
+          ? supabase.from('profiles').select('id, full_name, business_name').in('id', hostIds)
+          : Promise.resolve({ data: [], error: null })
+      ]);
+
+      // Create lookup maps
+      const bookingsMap = new Map(bookingsData?.map(b => [b.id, b]) || []);
+      const venuesMap = new Map(venuesData.data?.map(v => [v.id, v]) || []);
+      const guestsMap = new Map(guestsData.data?.map(g => [g.id, g]) || []);
+      const hostsMap = new Map(hostsData.data?.map(h => [h.id, h]) || []);
+
+      // Combine data
+      return flaggedData.map(dispute => {
+        const booking = bookingsMap.get(dispute.content_id);
+        const venue = booking ? venuesMap.get(booking.venue_id) : null;
+        const guest = booking ? guestsMap.get(booking.guest_id) : null;
+        const host = booking ? hostsMap.get(booking.host_id) : null;
+
+        return {
+          id: dispute.id,
+          content_id: dispute.content_id,
+          reason: dispute.reason,
+          description: dispute.description,
+          status: dispute.status,
+          created_at: dispute.created_at,
+          resolved_at: dispute.resolved_at,
+          flagged_by: dispute.flagged_by,
+          admin_id: dispute.admin_id,
+          booking_event_date: booking?.event_date || null,
+          booking_total_price: booking?.total_price || null,
+          booking_guest_count: booking?.guest_count || null,
+          venue_name: venue?.name || null,
+          guest_name: guest?.full_name || null,
+          host_name: host?.full_name || null,
+          host_business: host?.business_name || null
+        };
+      });
     },
     enabled: hasPermission(['super_admin', 'platform_manager', 'support_agent']),
   });
@@ -154,7 +212,7 @@ const BookingDisputes: React.FC = () => {
   const pendingDisputes = disputes?.filter(d => d.status === 'pending').length || 0;
   const investigatingDisputes = disputes?.filter(d => d.status === 'investigating').length || 0;
   const resolvedDisputes = disputes?.filter(d => d.status === 'resolved').length || 0;
-  const totalAmount = disputes?.reduce((sum, dispute) => sum + Number(dispute.booking?.total_price || 0), 0) || 0;
+  const totalAmount = disputes?.reduce((sum, dispute) => sum + Number(dispute.booking_total_price || 0), 0) || 0;
 
   return (
     <div className="space-y-6">
@@ -267,25 +325,25 @@ const BookingDisputes: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <div>
-                      <div className="font-medium">{dispute.booking?.venue?.name || 'Unknown Venue'}</div>
+                      <div className="font-medium">{dispute.venue_name || 'Unknown Venue'}</div>
                       <div className="text-sm text-gray-500">
-                        {dispute.booking?.event_date ? formatDate(dispute.booking.event_date) : 'No date'}
+                        {dispute.booking_event_date ? formatDate(dispute.booking_event_date) : 'No date'}
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div>
                       <div className="text-sm">
-                        <strong>Guest:</strong> {dispute.booking?.guest?.full_name || 'Unknown'}
+                        <strong>Guest:</strong> {dispute.guest_name || 'Unknown'}
                       </div>
                       <div className="text-sm">
-                        <strong>Host:</strong> {dispute.booking?.host?.business_name || dispute.booking?.host?.full_name || 'Unknown'}
+                        <strong>Host:</strong> {dispute.host_business || dispute.host_name || 'Unknown'}
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="font-medium">
-                      ${Number(dispute.booking?.total_price || 0).toLocaleString()}
+                      ${Number(dispute.booking_total_price || 0).toLocaleString()}
                     </div>
                   </TableCell>
                   <TableCell>

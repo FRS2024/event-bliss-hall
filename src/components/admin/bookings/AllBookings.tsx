@@ -21,18 +21,12 @@ interface BookingData {
   status: string;
   special_requests: string | null;
   created_at: string;
-  guest: {
-    full_name: string | null;
-    phone: string | null;
-  } | null;
-  venue: {
-    name: string;
-    city: string;
-  } | null;
-  host: {
-    full_name: string | null;
-    business_name: string | null;
-  } | null;
+  guest_name: string | null;
+  guest_phone: string | null;
+  venue_name: string | null;
+  venue_city: string | null;
+  host_name: string | null;
+  host_business: string | null;
 }
 
 const AllBookings: React.FC = () => {
@@ -46,41 +40,86 @@ const AllBookings: React.FC = () => {
     queryFn: async () => {
       console.log('Fetching all bookings...');
 
-      let query = supabase
+      // First get all bookings
+      let bookingQuery = supabase
         .from('bookings')
-        .select(`
-          *,
-          guest:profiles!bookings_guest_id_fkey(full_name, phone),
-          venue:venues(name, city),
-          host:profiles!bookings_host_id_fkey(full_name, business_name)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (statusFilter !== 'all') {
-        query = query.eq('status', statusFilter);
+        bookingQuery = bookingQuery.eq('status', statusFilter);
       }
 
-      const { data, error } = await query;
+      const { data: bookingsData, error: bookingsError } = await bookingQuery;
 
-      if (error) {
-        console.error('Error fetching bookings:', error);
-        throw error;
+      if (bookingsError) {
+        console.error('Error fetching bookings:', bookingsError);
+        throw bookingsError;
       }
 
-      return (data || []).map(booking => ({
-        id: booking.id,
-        event_date: booking.event_date,
-        start_time: booking.start_time,
-        end_time: booking.end_time,
-        guest_count: booking.guest_count,
-        total_price: booking.total_price,
-        status: booking.status,
-        special_requests: booking.special_requests,
-        created_at: booking.created_at,
-        guest: booking.guest,
-        venue: booking.venue,
-        host: booking.host
-      })) as BookingData[];
+      if (!bookingsData || bookingsData.length === 0) {
+        return [];
+      }
+
+      // Get all unique IDs
+      const guestIds = [...new Set(bookingsData.map(b => b.guest_id).filter(Boolean))];
+      const hostIds = [...new Set(bookingsData.map(b => b.host_id).filter(Boolean))];
+      const venueIds = [...new Set(bookingsData.map(b => b.venue_id).filter(Boolean))];
+
+      // Fetch related data
+      const [guestsData, hostsData, venuesData] = await Promise.all([
+        guestIds.length > 0 
+          ? supabase.from('profiles').select('id, full_name, phone').in('id', guestIds)
+          : Promise.resolve({ data: [], error: null }),
+        hostIds.length > 0
+          ? supabase.from('profiles').select('id, full_name, business_name').in('id', hostIds)
+          : Promise.resolve({ data: [], error: null }),
+        venueIds.length > 0
+          ? supabase.from('venues').select('id, name, city').in('id', venueIds)
+          : Promise.resolve({ data: [], error: null })
+      ]);
+
+      // Create lookup maps
+      const guestsMap = new Map(guestsData.data?.map(g => [g.id, g]) || []);
+      const hostsMap = new Map(hostsData.data?.map(h => [h.id, h]) || []);
+      const venuesMap = new Map(venuesData.data?.map(v => [v.id, v]) || []);
+
+      // Combine data
+      const combinedData = bookingsData.map(booking => {
+        const guest = guestsMap.get(booking.guest_id);
+        const host = hostsMap.get(booking.host_id);
+        const venue = venuesMap.get(booking.venue_id);
+
+        return {
+          id: booking.id,
+          event_date: booking.event_date,
+          start_time: booking.start_time,
+          end_time: booking.end_time,
+          guest_count: booking.guest_count,
+          total_price: booking.total_price,
+          status: booking.status,
+          special_requests: booking.special_requests,
+          created_at: booking.created_at,
+          guest_name: guest?.full_name || null,
+          guest_phone: guest?.phone || null,
+          venue_name: venue?.name || null,
+          venue_city: venue?.city || null,
+          host_name: host?.full_name || null,
+          host_business: host?.business_name || null
+        };
+      });
+
+      // Apply search filter
+      if (searchTerm) {
+        return combinedData.filter(booking => 
+          booking.guest_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          booking.venue_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          booking.host_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          booking.host_business?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+
+      return combinedData;
     },
     enabled: hasPermission(['super_admin', 'platform_manager', 'support_agent']),
   });
@@ -285,17 +324,17 @@ const AllBookings: React.FC = () => {
                   <TableCell>
                     <div>
                       <div className="font-medium">
-                        {booking.guest?.full_name || 'Unnamed Guest'}
+                        {booking.guest_name || 'Unnamed Guest'}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {booking.guest?.phone || 'No phone'}
+                        {booking.guest_phone || 'No phone'}
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div>
-                      <div className="font-medium">{booking.venue?.name || 'Unknown Venue'}</div>
-                      <div className="text-sm text-gray-500">{booking.venue?.city || 'Unknown City'}</div>
+                      <div className="font-medium">{booking.venue_name || 'Unknown Venue'}</div>
+                      <div className="text-sm text-gray-500">{booking.venue_city || 'Unknown City'}</div>
                     </div>
                   </TableCell>
                   <TableCell>
