@@ -14,8 +14,8 @@ import { useAdminAuth } from '@/hooks/useAdminAuth';
 interface BookingData {
   id: string;
   event_date: string;
-  start_time: string;
-  end_time: string;
+  start_time: string | null;
+  end_time: string | null;
   guest_count: number;
   total_price: number;
   status: string;
@@ -24,15 +24,15 @@ interface BookingData {
   guest: {
     full_name: string | null;
     phone: string | null;
-  };
+  } | null;
   venue: {
     name: string;
     city: string;
-  };
+  } | null;
   host: {
     full_name: string | null;
     business_name: string | null;
-  };
+  } | null;
 }
 
 const AllBookings: React.FC = () => {
@@ -60,10 +60,6 @@ const AllBookings: React.FC = () => {
         query = query.eq('status', statusFilter);
       }
 
-      if (searchTerm) {
-        query = query.or(`guest.full_name.ilike.%${searchTerm}%,venue.name.ilike.%${searchTerm}%`);
-      }
-
       const { data, error } = await query;
 
       if (error) {
@@ -71,7 +67,20 @@ const AllBookings: React.FC = () => {
         throw error;
       }
 
-      return data as BookingData[];
+      return (data || []).map(booking => ({
+        id: booking.id,
+        event_date: booking.event_date,
+        start_time: booking.start_time,
+        end_time: booking.end_time,
+        guest_count: booking.guest_count,
+        total_price: booking.total_price,
+        status: booking.status,
+        special_requests: booking.special_requests,
+        created_at: booking.created_at,
+        guest: booking.guest,
+        venue: booking.venue,
+        host: booking.host
+      })) as BookingData[];
     },
     enabled: hasPermission(['super_admin', 'platform_manager', 'support_agent']),
   });
@@ -126,7 +135,7 @@ const AllBookings: React.FC = () => {
     });
   };
 
-  const formatTime = (timeString: string) => {
+  const formatTime = (timeString: string | null) => {
     if (!timeString) return '';
     return new Date(`2000-01-01T${timeString}`).toLocaleTimeString('en-US', {
       hour: '2-digit',
@@ -276,17 +285,17 @@ const AllBookings: React.FC = () => {
                   <TableCell>
                     <div>
                       <div className="font-medium">
-                        {booking.guest.full_name || 'Unnamed Guest'}
+                        {booking.guest?.full_name || 'Unnamed Guest'}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {booking.guest.phone || 'No phone'}
+                        {booking.guest?.phone || 'No phone'}
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div>
-                      <div className="font-medium">{booking.venue.name}</div>
-                      <div className="text-sm text-gray-500">{booking.venue.city}</div>
+                      <div className="font-medium">{booking.venue?.name || 'Unknown Venue'}</div>
+                      <div className="text-sm text-gray-500">{booking.venue?.city || 'Unknown City'}</div>
                     </div>
                   </TableCell>
                   <TableCell>

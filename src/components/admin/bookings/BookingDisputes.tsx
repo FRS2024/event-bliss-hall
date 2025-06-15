@@ -28,15 +28,15 @@ interface DisputeData {
     guest_count: number;
     venue: {
       name: string;
-    };
+    } | null;
     guest: {
       full_name: string | null;
-    };
+    } | null;
     host: {
       full_name: string | null;
       business_name: string | null;
-    };
-  };
+    } | null;
+  } | null;
 }
 
 const BookingDisputes: React.FC = () => {
@@ -76,7 +76,18 @@ const BookingDisputes: React.FC = () => {
         throw error;
       }
 
-      return data as DisputeData[];
+      return (data || []).map(dispute => ({
+        id: dispute.id,
+        content_id: dispute.content_id,
+        reason: dispute.reason,
+        description: dispute.description,
+        status: dispute.status,
+        created_at: dispute.created_at,
+        resolved_at: dispute.resolved_at,
+        flagged_by: dispute.flagged_by,
+        admin_id: dispute.admin_id,
+        booking: dispute.booking
+      })) as DisputeData[];
     },
     enabled: hasPermission(['super_admin', 'platform_manager', 'support_agent']),
   });
@@ -256,9 +267,9 @@ const BookingDisputes: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <div>
-                      <div className="font-medium">{dispute.booking?.venue?.name}</div>
+                      <div className="font-medium">{dispute.booking?.venue?.name || 'Unknown Venue'}</div>
                       <div className="text-sm text-gray-500">
-                        {formatDate(dispute.booking?.event_date || '')}
+                        {dispute.booking?.event_date ? formatDate(dispute.booking.event_date) : 'No date'}
                       </div>
                     </div>
                   </TableCell>
