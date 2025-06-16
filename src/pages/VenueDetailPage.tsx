@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -7,7 +8,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Users, Star } from 'lucide-react';
 import VenueActions from '@/components/venues/VenueActions';
-import VenueReviewsAndComments from '@/components/venues/VenueReviewsAndComments';
 
 const VenueDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -113,9 +113,6 @@ const VenueDetailPage: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Reviews and Comments Section */}
-            <VenueReviewsAndComments venueId={venue.id} />
           </div>
 
           {/* Booking Sidebar */}

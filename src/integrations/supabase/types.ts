@@ -177,44 +177,6 @@ export type Database = {
           },
         ]
       }
-      comment_replies: {
-        Row: {
-          comment_id: string
-          content: string
-          created_at: string
-          id: string
-          is_flagged: boolean | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          comment_id: string
-          content: string
-          created_at?: string
-          id?: string
-          is_flagged?: boolean | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          comment_id?: string
-          content?: string
-          created_at?: string
-          id?: string
-          is_flagged?: boolean | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comment_replies_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "venue_comments"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       contact_submissions: {
         Row: {
           admin_email_id: string | null
@@ -559,54 +521,6 @@ export type Database = {
           },
         ]
       }
-      venue_comments: {
-        Row: {
-          booking_id: string
-          content: string
-          created_at: string
-          id: string
-          is_flagged: boolean | null
-          updated_at: string
-          user_id: string
-          venue_id: string
-        }
-        Insert: {
-          booking_id: string
-          content: string
-          created_at?: string
-          id?: string
-          is_flagged?: boolean | null
-          updated_at?: string
-          user_id: string
-          venue_id: string
-        }
-        Update: {
-          booking_id?: string
-          content?: string
-          created_at?: string
-          id?: string
-          is_flagged?: boolean | null
-          updated_at?: string
-          user_id?: string
-          venue_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "venue_comments_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "venue_comments_venue_id_fkey"
-            columns: ["venue_id"]
-            isOneToOne: false
-            referencedRelation: "venues"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       venue_features: {
         Row: {
           created_at: string
@@ -661,44 +575,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "venue_images_venue_id_fkey"
-            columns: ["venue_id"]
-            isOneToOne: false
-            referencedRelation: "venues"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      venue_reviews: {
-        Row: {
-          comment: string | null
-          created_at: string
-          id: string
-          rating: number
-          updated_at: string
-          user_id: string
-          venue_id: string
-        }
-        Insert: {
-          comment?: string | null
-          created_at?: string
-          id?: string
-          rating: number
-          updated_at?: string
-          user_id: string
-          venue_id: string
-        }
-        Update: {
-          comment?: string | null
-          created_at?: string
-          id?: string
-          rating?: number
-          updated_at?: string
-          user_id?: string
-          venue_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "venue_reviews_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
             referencedRelation: "venues"
