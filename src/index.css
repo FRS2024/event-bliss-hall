@@ -5,6 +5,57 @@
 @tailwind components;
 @tailwind utilities;
 
+/* RTL Support */
+[dir="rtl"] {
+  direction: rtl;
+}
+
+[dir="ltr"] {
+  direction: ltr;
+}
+
+/* RTL specific adjustments */
+[dir="rtl"] .rtl\:rotate-180 {
+  transform: rotate(180deg);
+}
+
+[dir="rtl"] .rtl\:space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .rtl\:text-right {
+  text-align: right;
+}
+
+[dir="rtl"] .rtl\:text-left {
+  text-align: left;
+}
+
+/* Flexbox adjustments for RTL */
+[dir="rtl"] .rtl\:flex-row-reverse {
+  flex-direction: row-reverse;
+}
+
+/* Margin and padding adjustments */
+[dir="rtl"] .rtl\:ml-auto {
+  margin-left: auto;
+}
+
+[dir="rtl"] .rtl\:mr-auto {
+  margin-right: auto;
+}
+
+/* Border radius adjustments */
+[dir="rtl"] .rtl\:rounded-l-none {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+[dir="rtl"] .rtl\:rounded-r-none {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
 @layer base {
   :root {
     --background: 30 33% 99%;

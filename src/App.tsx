@@ -5,6 +5,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import RTLProvider from "@/components/layout/RTLProvider";
+import "@/lib/i18n";
 
 import Index from "./pages/Index";
 import VenuesPage from "./pages/VenuesPage";
@@ -30,11 +32,12 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <Router>
+      <RTLProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <Router>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/venues" element={<VenuesPage />} />
@@ -60,6 +63,7 @@ function App() {
           </Router>
         </TooltipProvider>
       </AuthProvider>
+    </RTLProvider>
     </QueryClientProvider>
   );
 }

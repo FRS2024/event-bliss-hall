@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Mail, Phone, MapPin, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { useTranslatedToast } from '@/hooks/useTranslatedToast';
 import { supabase } from '@/integrations/supabase/client';
 
 const ContactPage: React.FC = () => {
@@ -14,17 +14,13 @@ const ContactPage: React.FC = () => {
     message: ''
   });
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const { showSuccess, showError, t } = useTranslatedToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-      toast({
-        title: "Missing fields",
-        description: "Please fill in all required fields.",
-        variant: "destructive",
-      });
+      showError("errors.validation", "errors.required");
       return;
     }
 
@@ -40,10 +36,7 @@ const ContactPage: React.FC = () => {
       }
 
       if (data?.success) {
-        toast({
-          title: "Message sent successfully!",
-          description: "We'll get back to you within 24 hours.",
-        });
+        showSuccess("contact.messageSent", "We'll get back to you within 24 hours.");
         
         // Reset form
         setFormData({
@@ -57,11 +50,7 @@ const ContactPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Contact form error:', error);
-      toast({
-        title: "Failed to send message",
-        description: error.message || "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
+      showError("contact.messageError", "errors.generic");
     } finally {
       setIsLoading(false);
     }
@@ -78,7 +67,7 @@ const ContactPage: React.FC = () => {
     <MainLayout>
       <div className="page-container py-16">
         <div className="text-center mb-16">
-          <h1 className="font-display text-4xl md:text-5xl mb-6">Contact Us</h1>
+          <h1 className="font-display text-4xl md:text-5xl mb-6">{t('nav.contact')}</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
           </p>

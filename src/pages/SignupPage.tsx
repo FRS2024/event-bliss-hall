@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import MainLayout from '@/components/layout/MainLayout';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { useTranslatedToast } from '@/hooks/useTranslatedToast';
 
 const SignupPage: React.FC = () => {
   const [firstName, setFirstName] = useState('');
@@ -16,7 +16,7 @@ const SignupPage: React.FC = () => {
   const [accountType, setAccountType] = useState('guest');
   const [loading, setLoading] = useState(false);
   const { signUp, user } = useAuth();
-  const { toast } = useToast();
+  const { showSuccess, showError, t } = useTranslatedToast();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,16 +32,9 @@ const SignupPage: React.FC = () => {
     const { error } = await signUp(email, password);
 
     if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      showError("errors.generic", error.message);
     } else {
-      toast({
-        title: "Success",
-        description: "Account created successfully! Please check your email to verify your account.",
-      });
+      showSuccess("auth.signUp", "Account created successfully! Please check your email to verify your account.");
       navigate('/');
     }
 
