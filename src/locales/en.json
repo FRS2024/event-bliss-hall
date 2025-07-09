@@ -21,6 +21,10 @@
     "welcomeDescription": "Select a conversation from the sidebar to start communicating with your guests about venue inquiries and bookings.",
     "welcomeDescriptionGuest": "Select a conversation from the sidebar to chat with hosts about venues you're interested in."
   },
+  "hero": {
+    "title": "Find Your Perfect Celebration Venue",
+    "subtitle": "Discover beautiful spaces for weddings, birthdays, corporate events and special occasions. Book with confidence and celebrate in style."
+  },
   "home": {
     "featuredVenues": "Featured Venues",
     "viewAllVenues": "View All Venues",
@@ -100,6 +104,7 @@
     "conference": "Conference",
     "party": "Party",
     "other": "Other Events",
+    "reception": "Reception",
     "searchPlaceholder": "Search categories...",
     "viewVenues": "View Venues"
   },

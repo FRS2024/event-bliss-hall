@@ -21,6 +21,10 @@
     "welcomeDescription": "Sélectionnez une conversation dans la barre latérale pour commencer à communiquer avec vos invités concernant les demandes de lieu et les réservations.",
     "welcomeDescriptionGuest": "Sélectionnez une conversation dans la barre latérale pour discuter avec les hôtes des lieux qui vous intéressent."
   },
+  "hero": {
+    "title": "Trouvez votre lieu de célébration parfait",
+    "subtitle": "Découvrez de beaux espaces pour les mariages, anniversaires, événements d'entreprise et occasions spéciales. Réservez en toute confiance et célébrez avec style."
+  },
   "home": {
     "featuredVenues": "Lieux en vedette",
     "viewAllVenues": "Voir tous les lieux",
@@ -100,6 +104,7 @@
     "conference": "Conférence",
     "party": "Fête",
     "other": "Autres événements",
+    "reception": "Réception",
     "searchPlaceholder": "Rechercher des catégories...",
     "viewVenues": "Voir les lieux"
   },

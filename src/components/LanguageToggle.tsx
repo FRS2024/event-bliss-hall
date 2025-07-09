@@ -5,6 +5,7 @@ import { ChevronDown, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const languages = [
+  { code: 'en', name: 'English', flag: '🇬🇧', nativeName: 'English' },
   { code: 'fr', name: 'Français', flag: '🇫🇷', nativeName: 'Français' },
   { code: 'ar', name: 'العربية', flag: '🇸🇦', nativeName: 'العربية' }
 ];

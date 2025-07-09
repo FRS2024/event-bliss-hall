@@ -1,9 +1,12 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import HeroSearch from './HeroSearch';
 
 const Hero: React.FC = () => {
+  const { t } = useTranslation();
+  
   return (
     <div className="relative min-h-[600px] flex items-center">
       {/* Hero Background */}
@@ -20,10 +23,10 @@ const Hero: React.FC = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl">
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl text-white mb-4 animate-fade-in">
-            Find Your Perfect Celebration Venue
+            {t('hero.title', 'Find Your Perfect Celebration Venue')}
           </h1>
           <p className="text-white/90 text-lg md:text-xl mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            Discover beautiful spaces for weddings, birthdays, corporate events and special occasions. Book with confidence and celebrate in style.
+            {t('hero.subtitle', 'Discover beautiful spaces for weddings, birthdays, corporate events and special occasions. Book with confidence and celebrate in style.')}
           </p>
           
           {/* Search Box */}
@@ -31,19 +34,19 @@ const Hero: React.FC = () => {
           
           <div className="flex flex-wrap gap-3 mt-6 animate-fade-in" style={{ animationDelay: '0.6s' }}>
             <Link to="/categories?category=wedding" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
-              Weddings
+              {t('categories.wedding')}
             </Link>
             <Link to="/categories?category=birthday" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
-              Birthdays
+              {t('categories.birthday')}
             </Link>
             <Link to="/categories?category=corporate" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
-              Corporate
+              {t('categories.corporate')}
             </Link>
             <Link to="/categories?category=reception" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
-              Receptions
+              {t('categories.reception', 'Reception')}
             </Link>
             <Link to="/categories?category=party" className="category-tag hover:bg-champagne-200 dark:hover:bg-champagne-800 transition-colors">
-              Parties
+              {t('categories.party')}
             </Link>
           </div>
         </div>

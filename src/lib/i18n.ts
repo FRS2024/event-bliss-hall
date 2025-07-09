@@ -12,9 +12,10 @@ const detectBrowserLanguage = () => {
   // Check if browser language matches our supported languages
   if (browserLang.startsWith('fr')) return 'fr';
   if (browserLang.startsWith('ar')) return 'ar';
+  if (browserLang.startsWith('en')) return 'en';
   
-  // Default to French if no match found
-  return 'fr';
+  // Default to English if no match found
+  return 'en';
 };
 
 // Get saved language or detect browser language
@@ -30,7 +31,7 @@ i18n
       ar: { translation: ar }
     },
     lng: initialLanguage,
-    fallbackLng: 'fr',
+    fallbackLng: 'en',
     interpolation: {
       escapeValue: false
     },
