@@ -41,47 +41,71 @@ const VenuesPage: React.FC = () => {
   }, [searchParams]);
   
   const handleFilter = (filters: any) => {
+    console.log('Filtering venues with filters:', filters);
+    console.log('Total venues:', venues.length);
+    
     let results = [...venues];
     
-    // Filter by search term
+    // Filter by search term - check name, city, address, and description
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       results = results.filter(
         venue => 
           venue.name.toLowerCase().includes(searchLower) ||
-          venue.location.toLowerCase().includes(searchLower) ||
+          venue.city?.toLowerCase().includes(searchLower) ||
+          venue.address?.toLowerCase().includes(searchLower) ||
           venue.description.toLowerCase().includes(searchLower)
       );
+      console.log(`After search filter: ${results.length} venues`);
     }
     
     // Filter by categories
     if (filters.categories.length > 0) {
       results = results.filter(venue => 
         filters.categories.some((cat: string) => 
-          venue.category.toLowerCase() === cat.toLowerCase()
+          venue.category === cat  // Exact match instead of case-insensitive
         )
       );
+      console.log(`After category filter: ${results.length} venues`);
     }
     
-    // Filter by price range
-    results = results.filter(
-      venue => venue.price >= filters.priceRange[0] && venue.price <= filters.priceRange[1]
-    );
+    // Enhanced price filtering - check all price types
+    results = results.filter(venue => {
+      const prices = [
+        venue.price_per_hour,
+        venue.price_per_day,
+        venue.price_per_event,
+        venue.price  // fallback for legacy price field
+      ].filter(price => price != null && price > 0);
+      
+      if (prices.length === 0) return false;
+      
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      
+      return (minPrice >= filters.priceRange[0] && minPrice <= filters.priceRange[1]) ||
+             (maxPrice >= filters.priceRange[0] && maxPrice <= filters.priceRange[1]) ||
+             (minPrice <= filters.priceRange[0] && maxPrice >= filters.priceRange[1]);
+    });
+    console.log(`After price filter: ${results.length} venues`);
     
     // Filter by capacity
     results = results.filter(
       venue => venue.capacity >= filters.capacity[0] && venue.capacity <= filters.capacity[1]
     );
+    console.log(`After capacity filter: ${results.length} venues`);
     
-    // Filter by amenities
+    // Filter by amenities - check venue amenities
     if (filters.amenities.length > 0) {
       results = results.filter(venue => 
         filters.amenities.every((amenity: string) => 
-          venue.amenities.includes(amenity)
+          venue.amenities?.includes(amenity)
         )
       );
+      console.log(`After amenities filter: ${results.length} venues`);
     }
     
+    console.log('Final filtered venues:', results);
     setFilteredVenues(results);
   };
 
