@@ -12,7 +12,8 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, user } = useAuth();
+  const [oauthLoading, setOauthLoading] = useState<string | null>(null);
+  const { signIn, signInWithGoogle, signInWithGitHub, user } = useAuth();
   const { showSuccess, showError, t } = useTranslatedToast();
   const navigate = useNavigate();
 
@@ -36,6 +37,24 @@ const LoginPage: React.FC = () => {
     }
 
     setLoading(false);
+  };
+
+  const handleGoogleSignIn = async () => {
+    setOauthLoading('google');
+    const { error } = await signInWithGoogle();
+    if (error) {
+      showError("errors.generic", error.message);
+    }
+    setOauthLoading(null);
+  };
+
+  const handleGitHubSignIn = async () => {
+    setOauthLoading('github');
+    const { error } = await signInWithGitHub();
+    if (error) {
+      showError("errors.generic", error.message);
+    }
+    setOauthLoading(null);
   };
 
   return (
@@ -111,11 +130,21 @@ const LoginPage: React.FC = () => {
             </div>
             
             <div className="mt-6 grid grid-cols-2 gap-3">
-              <Button variant="outline" className="w-full">
-                {t('auth.google')}
+              <Button 
+                variant="outline" 
+                className="w-full" 
+                onClick={handleGoogleSignIn}
+                disabled={oauthLoading !== null}
+              >
+                {oauthLoading === 'google' ? t('auth.signingIn') : t('auth.google')}
               </Button>
-              <Button variant="outline" className="w-full">
-                {t('auth.github')}
+              <Button 
+                variant="outline" 
+                className="w-full" 
+                onClick={handleGitHubSignIn}
+                disabled={oauthLoading !== null}
+              >
+                {oauthLoading === 'github' ? t('auth.signingIn') : t('auth.github')}
               </Button>
             </div>
           </div>

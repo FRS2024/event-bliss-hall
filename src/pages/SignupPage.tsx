@@ -15,7 +15,8 @@ const SignupPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [accountType, setAccountType] = useState('guest');
   const [loading, setLoading] = useState(false);
-  const { signUp, user } = useAuth();
+  const [oauthLoading, setOauthLoading] = useState<string | null>(null);
+  const { signUp, signInWithGoogle, signInWithGitHub, user } = useAuth();
   const { showSuccess, showError, t } = useTranslatedToast();
   const navigate = useNavigate();
 
@@ -39,6 +40,24 @@ const SignupPage: React.FC = () => {
     }
 
     setLoading(false);
+  };
+
+  const handleGoogleSignIn = async () => {
+    setOauthLoading('google');
+    const { error } = await signInWithGoogle();
+    if (error) {
+      showError("errors.generic", error.message);
+    }
+    setOauthLoading(null);
+  };
+
+  const handleGitHubSignIn = async () => {
+    setOauthLoading('github');
+    const { error } = await signInWithGitHub();
+    if (error) {
+      showError("errors.generic", error.message);
+    }
+    setOauthLoading(null);
   };
 
   return (
@@ -160,11 +179,21 @@ const SignupPage: React.FC = () => {
             </div>
             
             <div className="mt-6 grid grid-cols-2 gap-3">
-              <Button variant="outline" className="w-full">
-                Google
+              <Button 
+                variant="outline" 
+                className="w-full" 
+                onClick={handleGoogleSignIn}
+                disabled={oauthLoading !== null}
+              >
+                {oauthLoading === 'google' ? 'Connecting...' : 'Google'}
               </Button>
-              <Button variant="outline" className="w-full">
-                GitHub
+              <Button 
+                variant="outline" 
+                className="w-full" 
+                onClick={handleGitHubSignIn}
+                disabled={oauthLoading !== null}
+              >
+                {oauthLoading === 'github' ? 'Connecting...' : 'GitHub'}
               </Button>
             </div>
           </div>
