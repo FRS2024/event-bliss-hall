@@ -9,6 +9,9 @@ interface AuthContextType {
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  updatePassword: (currentPassword: string, newPassword: string) => Promise<{ error: any }>;
+  updateEmail: (newEmail: string, password: string) => Promise<{ error: any }>;
+  updatePhone: (phoneNumber: string) => Promise<{ error: any }>;
   loading: boolean;
 }
 
@@ -74,12 +77,61 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await supabase.auth.signOut();
   };
 
+  const updatePassword = async (currentPassword: string, newPassword: string) => {
+    // First verify current password
+    const { error: verificationError } = await supabase.auth.signInWithPassword({
+      email: user?.email || '',
+      password: currentPassword
+    });
+
+    if (verificationError) {
+      return { error: { message: 'Current password is incorrect' } };
+    }
+
+    // Update to new password
+    const { error } = await supabase.auth.updateUser({ 
+      password: newPassword 
+    });
+
+    return { error };
+  };
+
+  const updateEmail = async (newEmail: string, password: string) => {
+    // Verify current password before email change
+    const { error: verificationError } = await supabase.auth.signInWithPassword({
+      email: user?.email || '',
+      password: password
+    });
+
+    if (verificationError) {
+      return { error: { message: 'Current password is incorrect' } };
+    }
+
+    // Update email (requires confirmation)
+    const { error } = await supabase.auth.updateUser({ 
+      email: newEmail 
+    });
+
+    return { error };
+  };
+
+  const updatePhone = async (phoneNumber: string) => {
+    const { error } = await supabase.auth.updateUser({ 
+      phone: phoneNumber 
+    });
+
+    return { error };
+  };
+
   const value = {
     user,
     session,
     signUp,
     signIn,
     signOut,
+    updatePassword,
+    updateEmail,
+    updatePhone,
     loading
   };
 

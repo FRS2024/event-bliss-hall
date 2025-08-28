@@ -318,6 +318,31 @@
     "bookingCancelled": "Booking cancelled successfully!",
     "messageSent": "Message sent successfully!",
     "profileUpdated": "Profile updated successfully!",
-    "settingsSaved": "Settings saved successfully!"
+    "settingsSaved": "Settings saved successfully!",
+    "passwordUpdated": "Password updated successfully!",
+    "emailUpdateSent": "Email update confirmation sent. Please check your new email.",
+    "phoneUpdated": "Phone number updated successfully!"
+  },
+  "security": {
+    "changePassword": "Change Password",
+    "changeEmail": "Change Email",
+    "updatePhone": "Update Phone Number",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "currentEmail": "Current Email",
+    "newEmail": "New Email",
+    "confirmWithPassword": "Confirm with Password",
+    "currentAuthPhone": "Current Auth Phone",
+    "newPhoneNumber": "New Phone Number",
+    "updating": "Updating...",
+    "updatePassword": "Update Password",
+    "updateEmail": "Update Email",
+    "updatePhoneNumber": "Update Phone Number",
+    "passwordMinLength": "Password must be at least 8 characters long",
+    "passwordsDontMatch": "New passwords do not match",
+    "allFieldsRequired": "All fields are required",
+    "invalidEmail": "Please enter a valid email address",
+    "incorrectPassword": "Current password is incorrect"
   }
 }
