@@ -11,13 +11,13 @@ interface VenueFiltersProps {
 const VenueFilters: React.FC<VenueFiltersProps> = ({ onFilter }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 500000]);
-  const [capacity, setCapacity] = useState([0, 500]);
+  const [capacity, setCapacity] = useState([0, 1000]);
   const [filters, setFilters] = useState({
     search: '',
     categories: [] as string[],
     amenities: [] as string[],
     priceRange: [0, 500000],
-    capacity: [0, 500],
+    capacity: [0, 1000],
   });
   
   // Auto-apply filters whenever they change
@@ -85,11 +85,11 @@ const VenueFilters: React.FC<VenueFiltersProps> = ({ onFilter }) => {
       categories: [],
       amenities: [],
       priceRange: [0, 500000],
-      capacity: [0, 500],
+      capacity: [0, 1000],
     };
     
     setPriceRange([0, 500000]);
-    setCapacity([0, 500]);
+    setCapacity([0, 1000]);
     setFilters(resetFilters);
   };
   
@@ -177,7 +177,7 @@ const VenueFilters: React.FC<VenueFiltersProps> = ({ onFilter }) => {
             <Slider
               value={capacity}
               min={0}
-              max={500}
+              max={1000}
               step={10}
               onValueChange={handleCapacityChange}
               className="my-6"
