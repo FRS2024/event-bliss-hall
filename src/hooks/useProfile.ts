@@ -11,6 +11,7 @@ export interface Profile {
   phone?: string;
   bio?: string;
   avatar_url?: string;
+  user_role?: 'guest' | 'host';
   created_at: string;
   updated_at: string;
 }

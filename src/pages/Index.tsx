@@ -9,10 +9,14 @@ import { Button } from '@/components/ui/button';
 import { Venue } from '@/types';
 import { getFeaturedVenues } from '@/lib/api';
 import { useTranslation } from 'react-i18next';
+import { useRoleRedirect } from '@/hooks/useRoleRedirect';
 
 const Index: React.FC = () => {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Handle role selection redirect for OAuth users
+  useRoleRedirect();
   const { t } = useTranslation();
   
   useEffect(() => {

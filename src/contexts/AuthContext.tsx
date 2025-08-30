@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, accountType?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
   signInWithGitHub: () => Promise<{ error: any }>;
@@ -14,6 +14,7 @@ interface AuthContextType {
   updatePassword: (currentPassword: string, newPassword: string) => Promise<{ error: any }>;
   updateEmail: (newEmail: string, password: string) => Promise<{ error: any }>;
   updatePhone: (phoneNumber: string) => Promise<{ error: any }>;
+  updateUserRole: (role: 'guest' | 'host') => Promise<{ error: any }>;
   loading: boolean;
 }
 
@@ -54,14 +55,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, accountType?: string) => {
     const redirectUrl = `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl
+        emailRedirectTo: redirectUrl,
+        data: {
+          user_role: accountType || 'guest'
+        }
       }
     });
     return { error };
@@ -145,6 +149,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
+  const updateUserRole = async (role: 'guest' | 'host') => {
+    if (!user) return { error: { message: 'No user found' } };
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ user_role: role })
+      .eq('id', user.id);
+
+    return { error };
+  };
+
   const value = {
     user,
     session,
@@ -156,6 +171,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updatePassword,
     updateEmail,
     updatePhone,
+    updateUserRole,
     loading
   };
 

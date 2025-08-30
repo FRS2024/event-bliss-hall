@@ -14,6 +14,7 @@ import VenueDetailPage from "./pages/VenueDetailPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import RoleSelectionPage from "./pages/RoleSelectionPage";
 import DashboardPage from "./pages/DashboardPage";
 import EditVenuePage from "./pages/EditVenuePage";
 import SettingsPage from "./pages/SettingsPage";
@@ -51,6 +52,7 @@ function App() {
               <Route path="/cookies" element={<CookiePolicyPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
+              <Route path="/select-role" element={<RoleSelectionPage />} />
               <Route path="/dashboard/*" element={<DashboardPage />} />
               <Route path="/dashboard/venues/:id/edit" element={<EditVenuePage />} />
               <Route path="/settings" element={<SettingsPage />} />

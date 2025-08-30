@@ -15,6 +15,19 @@ export const useUserRole = () => {
 
       console.log('Checking user role for:', user.id);
 
+      // First check stored role in profile
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_role')
+        .eq('id', user.id)
+        .single();
+
+      if (!profileError && profile?.user_role) {
+        console.log('User role from profile:', profile.user_role);
+        return profile.user_role;
+      }
+
+      // Fallback to venue-based detection
       const { data: venues, error } = await supabase
         .from('venues')
         .select('id')
@@ -27,7 +40,7 @@ export const useUserRole = () => {
       }
 
       const role = venues && venues.length > 0 ? 'host' : 'guest';
-      console.log('User role determined:', role);
+      console.log('User role determined from venues:', role);
       return role;
     },
     enabled: !!user,

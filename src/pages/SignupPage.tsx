@@ -30,7 +30,7 @@ const SignupPage: React.FC = () => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await signUp(email, password);
+    const { error } = await signUp(email, password, accountType);
 
     if (error) {
       showError("errors.generic", error.message);
