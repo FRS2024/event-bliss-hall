@@ -7,7 +7,7 @@ import { getVenueById } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Users, Star } from 'lucide-react';
-import VenueActions from '@/components/venues/VenueActions';
+import BookingCalendarSection from '@/components/booking/BookingCalendarSection';
 
 const VenueDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -117,38 +117,36 @@ const VenueDetailPage: React.FC = () => {
 
           {/* Booking Sidebar */}
           <div className="space-y-6">
+            {/* Price Card */}
             <Card>
               <CardContent className="p-6">
-                <div className="text-center mb-6">
-                  <div className="text-3xl font-bold text-primary mb-2">
+                <div className="text-center mb-4">
+                  <div className="text-3xl font-bold text-primary mb-1">
                     {venue.price} DA
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-muted-foreground">
                     {venue.price_per_day ? 'per day' : 
                      venue.price_per_event ? 'per event' : 'per hour'}
                   </div>
                 </div>
 
-                <VenueActions venue={venue} />
-
-                <div className="mt-6 pt-6 border-t">
-                  <div className="text-sm text-gray-600 space-y-2">
+                <div className="pt-4 border-t border-border">
+                  <div className="text-sm text-muted-foreground space-y-2">
                     <div className="flex justify-between">
                       <span>Category:</span>
-                      <span>{venue.category}</span>
+                      <span className="text-foreground">{venue.category}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Capacity:</span>
-                      <span>{venue.capacity} guests</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Availability:</span>
-                      <span className="text-green-600">{venue.availability}</span>
+                      <span className="text-foreground">{venue.capacity} guests</span>
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
+
+            {/* Booking Calendar */}
+            <BookingCalendarSection venue={venue} />
           </div>
         </div>
       </div>

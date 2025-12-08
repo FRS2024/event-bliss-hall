@@ -18,7 +18,7 @@ export type Database = {
         Row: {
           admin_id: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           is_active: boolean | null
           login_at: string
           logout_at: string | null
@@ -27,7 +27,7 @@ export type Database = {
         Insert: {
           admin_id: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           is_active?: boolean | null
           login_at?: string
           logout_at?: string | null
@@ -36,7 +36,7 @@ export type Database = {
         Update: {
           admin_id?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           is_active?: boolean | null
           login_at?: string
           logout_at?: string | null
@@ -504,7 +504,7 @@ export type Database = {
           action: string
           created_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           metadata: Json | null
           resource_id: string | null
           resource_type: string | null
@@ -514,7 +514,7 @@ export type Database = {
           action: string
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           resource_id?: string | null
           resource_type?: string | null
@@ -524,7 +524,7 @@ export type Database = {
           action?: string
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           resource_id?: string | null
           resource_type?: string | null
@@ -779,14 +779,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_admin_role: {
-        Args: { user_id: string }
-        Returns: string
-      }
-      is_admin: {
-        Args: { user_id: string }
-        Returns: boolean
-      }
+      get_admin_role: { Args: { user_id: string }; Returns: string }
+      is_admin: { Args: { user_id: string }; Returns: boolean }
     }
     Enums: {
       user_role: "guest" | "host"
