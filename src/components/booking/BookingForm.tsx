@@ -12,13 +12,14 @@ import { toast } from 'sonner';
 
 interface BookingFormProps {
   venue: Venue;
+  initialDate?: string;
   onSubmit: (bookingId: string) => void;
   onCancel: () => void;
 }
 
-const BookingForm: React.FC<BookingFormProps> = ({ venue, onSubmit, onCancel }) => {
+const BookingForm: React.FC<BookingFormProps> = ({ venue, initialDate, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
-    eventDate: '',
+    eventDate: initialDate || '',
     startTime: '',
     endTime: '',
     guestCount: 1,
