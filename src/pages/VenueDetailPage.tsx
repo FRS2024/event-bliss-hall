@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -8,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Users, Star } from 'lucide-react';
 import BookingCalendarSection from '@/components/booking/BookingCalendarSection';
+import VenueImageGallery from '@/components/venues/VenueImageGallery';
 
 const VenueDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,10 +23,10 @@ const VenueDetailPage: React.FC = () => {
       <MainLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-            <div className="h-64 bg-gray-200 rounded mb-6"></div>
-            <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-8 bg-muted rounded w-1/3 mb-4"></div>
+            <div className="h-[480px] bg-muted rounded-xl mb-6"></div>
+            <div className="h-4 bg-muted rounded w-2/3 mb-2"></div>
+            <div className="h-4 bg-muted rounded w-1/2"></div>
           </div>
         </div>
       </MainLayout>
@@ -40,7 +40,7 @@ const VenueDetailPage: React.FC = () => {
           <Card>
             <CardContent className="text-center py-8">
               <h2 className="text-xl font-semibold mb-2">Venue Not Found</h2>
-              <p className="text-gray-600">The venue you're looking for doesn't exist or has been removed.</p>
+              <p className="text-muted-foreground">The venue you're looking for doesn't exist or has been removed.</p>
             </CardContent>
           </Card>
         </div>
@@ -51,54 +51,38 @@ const VenueDetailPage: React.FC = () => {
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
+        {/* Image Gallery - Full Width */}
+        <div className="mb-8 group">
+          <VenueImageGallery 
+            images={venue.images} 
+            venueName={venue.name}
+          />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Image Gallery */}
-            <div className="aspect-video rounded-lg overflow-hidden">
-              <img
-                src={venue.images[0] || '/placeholder.svg'}
-                alt={venue.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Additional Images */}
-            {venue.images.length > 1 && (
-              <div className="grid grid-cols-3 gap-4">
-                {venue.images.slice(1, 4).map((image, index) => (
-                  <div key={index} className="aspect-video rounded-lg overflow-hidden">
-                    <img
-                      src={image}
-                      alt={`${venue.name} ${index + 2}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-
             {/* Venue Details */}
             <Card>
               <CardContent className="p-6">
                 <h1 className="text-3xl font-bold mb-2">{venue.name}</h1>
                 
-                <div className="flex items-center gap-4 mb-4">
+                <div className="flex flex-wrap items-center gap-4 mb-4">
                   <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-1 text-gray-500" />
-                    <span className="text-gray-600">{venue.location}</span>
+                    <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
+                    <span className="text-muted-foreground">{venue.location}</span>
                   </div>
                   <div className="flex items-center">
-                    <Users className="h-4 w-4 mr-1 text-gray-500" />
-                    <span className="text-gray-600">Up to {venue.capacity} guests</span>
+                    <Users className="h-4 w-4 mr-1 text-muted-foreground" />
+                    <span className="text-muted-foreground">Up to {venue.capacity} guests</span>
                   </div>
                   <div className="flex items-center">
-                    <Star className="h-4 w-4 mr-1 text-yellow-500 fill-current" />
-                    <span className="text-gray-600">{venue.rating} ({venue.reviewCount} reviews)</span>
+                    <Star className="h-4 w-4 mr-1 text-champagne-500 fill-champagne-500" />
+                    <span className="text-muted-foreground">{venue.rating} ({venue.reviewCount} reviews)</span>
                   </div>
                 </div>
 
-                <p className="text-gray-700 mb-6">{venue.description}</p>
+                <p className="text-muted-foreground mb-6">{venue.description}</p>
 
                 {/* Amenities */}
                 <div>

@@ -1,16 +1,32 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Star, MapPin, Calendar, Users } from 'lucide-react';
+import { Heart, Star, MapPin, Calendar, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Venue } from '@/types';
+import { cn } from '@/lib/utils';
 
 interface VenueCardProps {
   venue: Venue;
 }
 
 const VenueCard: React.FC<VenueCardProps> = ({ venue }) => {
-  const [isLiked, setIsLiked] = React.useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  const images = venue.images || [];
+  const hasMultipleImages = images.length > 1;
+  
+  const goToNextImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+  };
+  
+  const goToPrevImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
   
   // Determine price display
   const priceDisplay = () => {
@@ -22,21 +38,84 @@ const VenueCard: React.FC<VenueCardProps> = ({ venue }) => {
   
   return (
     <div className="venue-card group">
-      <div className="relative">
+      <div className="relative overflow-hidden rounded-t-xl">
         <Link to={`/venues/${venue.id}`}>
-          <img
-            src={venue.images[0] || '/placeholder.svg'}
-            alt={venue.name}
-            className="w-full h-60 object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-          <div className="image-overlay" />
+          <div className="relative aspect-[4/3] overflow-hidden">
+            <img
+              src={images[currentImageIndex] || '/placeholder.svg'}
+              alt={venue.name}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="image-overlay" />
+          </div>
         </Link>
+        
+        {/* Navigation Arrows */}
+        {hasMultipleImages && (
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={goToPrevImage}
+              className={cn(
+                "absolute left-2 top-1/2 -translate-y-1/2 z-20",
+                "w-8 h-8 rounded-full bg-white/90 dark:bg-black/70 backdrop-blur-sm shadow-md",
+                "text-foreground hover:bg-white dark:hover:bg-black/90",
+                "opacity-0 group-hover:opacity-100 transition-all duration-300"
+              )}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={goToNextImage}
+              className={cn(
+                "absolute right-2 top-1/2 -translate-y-1/2 z-20",
+                "w-8 h-8 rounded-full bg-white/90 dark:bg-black/70 backdrop-blur-sm shadow-md",
+                "text-foreground hover:bg-white dark:hover:bg-black/90",
+                "opacity-0 group-hover:opacity-100 transition-all duration-300"
+              )}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </>
+        )}
+        
+        {/* Dot Indicators */}
+        {hasMultipleImages && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex gap-1.5">
+            {images.slice(0, 5).map((_, index) => (
+              <button
+                key={index}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setCurrentImageIndex(index);
+                }}
+                className={cn(
+                  "w-1.5 h-1.5 rounded-full transition-all duration-300",
+                  index === currentImageIndex 
+                    ? "bg-white w-3" 
+                    : "bg-white/60 hover:bg-white/80"
+                )}
+              />
+            ))}
+            {images.length > 5 && (
+              <span className="text-white text-xs ml-1">+{images.length - 5}</span>
+            )}
+          </div>
+        )}
         
         <Button
           variant="ghost"
           size="icon"
           className="absolute top-2 right-2 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full z-10 hover:bg-white dark:hover:bg-black/70"
-          onClick={() => setIsLiked(!isLiked)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsLiked(!isLiked);
+          }}
         >
           <Heart 
             size={20} 
