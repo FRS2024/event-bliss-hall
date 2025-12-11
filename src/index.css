@@ -205,6 +205,16 @@
   .gradient-shift:hover {
     background-position: 100% 100%;
   }
+
+  /* Hide scrollbar for image galleries */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Custom animations for enhanced interactivity */
