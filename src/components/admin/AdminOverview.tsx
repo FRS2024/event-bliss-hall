@@ -1,9 +1,11 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAdminStats } from '@/hooks/useAdminStats';
+import { useRecentActivity, formatRelativeTime } from './hooks/useRecentActivity';
+import ExportReportModal from './modals/ExportReportModal';
+import AnnouncementModal from './modals/AnnouncementModal';
 import { 
   Users, 
   Building2, 
@@ -12,12 +14,17 @@ import {
   TrendingUp, 
   AlertTriangle,
   Clock,
-  CheckCircle
+  CheckCircle,
+  FileSpreadsheet,
+  Megaphone
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 const AdminOverview: React.FC = () => {
   const { stats, isLoading, error } = useAdminStats();
+  const { data: recentActivity, isLoading: activityLoading } = useRecentActivity();
+  const [exportModalOpen, setExportModalOpen] = React.useState(false);
+  const [announcementModalOpen, setAnnouncementModalOpen] = React.useState(false);
 
   if (isLoading) {
     return (
@@ -59,8 +66,14 @@ const AdminOverview: React.FC = () => {
           <p className="text-gray-600 dark:text-gray-400">Welcome to EasyHall's mission control center</p>
         </div>
         <div className="flex space-x-2">
-          <Button variant="outline">Export Report</Button>
-          <Button>Send Announcement</Button>
+          <Button variant="outline" onClick={() => setExportModalOpen(true)}>
+            <FileSpreadsheet className="h-4 w-4 mr-2" />
+            Export Report
+          </Button>
+          <Button onClick={() => setAnnouncementModalOpen(true)}>
+            <Megaphone className="h-4 w-4 mr-2" />
+            Send Announcement
+          </Button>
         </div>
       </div>
 
@@ -73,9 +86,7 @@ const AdminOverview: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.overview.totalUsers}</div>
-            <p className="text-xs text-muted-foreground">
-              +{stats.today.newUsers} today
-            </p>
+            <p className="text-xs text-muted-foreground">+{stats.today.newUsers} today</p>
           </CardContent>
         </Card>
 
@@ -86,9 +97,7 @@ const AdminOverview: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.overview.activeVenues}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats.pending.venues} pending approval
-            </p>
+            <p className="text-xs text-muted-foreground">{stats.pending.venues} pending approval</p>
           </CardContent>
         </Card>
 
@@ -99,9 +108,7 @@ const AdminOverview: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.overview.totalBookings}</div>
-            <p className="text-xs text-muted-foreground">
-              +{stats.today.newBookings} today
-            </p>
+            <p className="text-xs text-muted-foreground">+{stats.today.newBookings} today</p>
           </CardContent>
         </Card>
 
@@ -112,9 +119,7 @@ const AdminOverview: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.overview.totalRevenue} DA</div>
-            <p className="text-xs text-muted-foreground">
-              +{stats.today.revenue} DA today
-            </p>
+            <p className="text-xs text-muted-foreground">+{stats.today.revenue} DA today</p>
           </CardContent>
         </Card>
       </div>
@@ -133,10 +138,7 @@ const AdminOverview: React.FC = () => {
               <div key={index} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <div>
                   <p className="font-medium text-sm">{action.title}</p>
-                  <Badge 
-                    variant={action.count > 0 ? "destructive" : "secondary"}
-                    className="mt-1"
-                  >
+                  <Badge variant={action.count > 0 ? "destructive" : "secondary"} className="mt-1">
                     {action.count} items
                   </Badge>
                 </div>
@@ -200,7 +202,7 @@ const AdminOverview: React.FC = () => {
         </Card>
       </div>
 
-      {/* Recent Activity */}
+      {/* Recent Activity - Now from Database */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
@@ -210,37 +212,28 @@ const AdminOverview: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="flex items-center justify-between py-2 border-b">
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-sm">New user registration from Algiers</span>
-              </div>
-              <span className="text-xs text-gray-500">2 minutes ago</span>
-            </div>
-            <div className="flex items-center justify-between py-2 border-b">
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span className="text-sm">Venue "Grand Hall Oran" approved</span>
-              </div>
-              <span className="text-xs text-gray-500">15 minutes ago</span>
-            </div>
-            <div className="flex items-center justify-between py-2 border-b">
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                <span className="text-sm">Booking dispute resolved for Event #1234</span>
-              </div>
-              <span className="text-xs text-gray-500">1 hour ago</span>
-            </div>
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                <span className="text-sm">Platform announcement sent to all hosts</span>
-              </div>
-              <span className="text-xs text-gray-500">3 hours ago</span>
-            </div>
+            {activityLoading ? (
+              <p className="text-muted-foreground text-center py-4">Loading activity...</p>
+            ) : recentActivity && recentActivity.length > 0 ? (
+              recentActivity.map((activity) => (
+                <div key={activity.id} className="flex items-center justify-between py-2 border-b last:border-0">
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-2 h-2 ${activity.color} rounded-full`}></div>
+                    <span className="text-sm">{activity.message}</span>
+                  </div>
+                  <span className="text-xs text-gray-500">{formatRelativeTime(activity.timestamp)}</span>
+                </div>
+              ))
+            ) : (
+              <p className="text-muted-foreground text-center py-4">No recent activity</p>
+            )}
           </div>
         </CardContent>
       </Card>
+
+      {/* Modals */}
+      <ExportReportModal open={exportModalOpen} onOpenChange={setExportModalOpen} />
+      <AnnouncementModal open={announcementModalOpen} onOpenChange={setAnnouncementModalOpen} />
     </div>
   );
 };
