@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_activity_log: {
+        Row: {
+          action: string
+          admin_id: string | null
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: unknown
+          resource_id: string | null
+          resource_type: string
+        }
+        Insert: {
+          action: string
+          admin_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_activity_log_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_sessions: {
         Row: {
           admin_id: string
@@ -304,6 +345,7 @@ export type Database = {
       flagged_content: {
         Row: {
           admin_id: string | null
+          admin_notes: string | null
           content_id: string
           content_type: string
           created_at: string
@@ -311,11 +353,13 @@ export type Database = {
           flagged_by: string | null
           id: string
           reason: string
+          resolution_type: string | null
           resolved_at: string | null
           status: string | null
         }
         Insert: {
           admin_id?: string | null
+          admin_notes?: string | null
           content_id: string
           content_type: string
           created_at?: string
@@ -323,11 +367,13 @@ export type Database = {
           flagged_by?: string | null
           id?: string
           reason: string
+          resolution_type?: string | null
           resolved_at?: string | null
           status?: string | null
         }
         Update: {
           admin_id?: string | null
+          admin_notes?: string | null
           content_id?: string
           content_type?: string
           created_at?: string
@@ -335,6 +381,7 @@ export type Database = {
           flagged_by?: string | null
           id?: string
           reason?: string
+          resolution_type?: string | null
           resolved_at?: string | null
           status?: string | null
         }
@@ -418,7 +465,11 @@ export type Database = {
           created_at: string | null
           full_name: string | null
           id: string
+          is_suspended: boolean | null
           phone: string | null
+          suspended_at: string | null
+          suspended_by: string | null
+          suspended_reason: string | null
           updated_at: string | null
           user_role: Database["public"]["Enums"]["user_role"] | null
         }
@@ -429,7 +480,11 @@ export type Database = {
           created_at?: string | null
           full_name?: string | null
           id: string
+          is_suspended?: boolean | null
           phone?: string | null
+          suspended_at?: string | null
+          suspended_by?: string | null
+          suspended_reason?: string | null
           updated_at?: string | null
           user_role?: Database["public"]["Enums"]["user_role"] | null
         }
@@ -440,7 +495,11 @@ export type Database = {
           created_at?: string | null
           full_name?: string | null
           id?: string
+          is_suspended?: boolean | null
           phone?: string | null
+          suspended_at?: string | null
+          suspended_by?: string | null
+          suspended_reason?: string | null
           updated_at?: string | null
           user_role?: Database["public"]["Enums"]["user_role"] | null
         }
@@ -566,6 +625,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      venue_categories: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+          venue_count: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string | null
+          venue_count?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+          venue_count?: number | null
+        }
+        Relationships: []
       }
       venue_comments: {
         Row: {

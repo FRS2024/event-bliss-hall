@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,8 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar, Users, DollarSign, Clock } from 'lucide-react';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useAllBookings } from './hooks/useAllBookings';
+import BookingDetailModal from '../modals/BookingDetailModal';
 
 const AllBookings: React.FC = () => {
+  const [selectedBookingId, setSelectedBookingId] = React.useState<string | null>(null);
+  const [bookingModalOpen, setBookingModalOpen] = React.useState(false);
   const { hasPermission } = useAdminAuth();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState('all');
@@ -245,14 +247,9 @@ const AllBookings: React.FC = () => {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <div className="flex space-x-2">
-                      <Button variant="outline" size="sm">
-                        View
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        Edit
-                      </Button>
-                    </div>
+                    <Button variant="outline" size="sm" onClick={() => { setSelectedBookingId(booking.id); setBookingModalOpen(true); }}>
+                      View Details
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -260,6 +257,8 @@ const AllBookings: React.FC = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <BookingDetailModal bookingId={selectedBookingId} open={bookingModalOpen} onOpenChange={setBookingModalOpen} />
     </div>
   );
 };
