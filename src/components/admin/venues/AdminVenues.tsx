@@ -5,6 +5,7 @@ import VenuePendingApproval from './VenuePendingApproval';
 import ActiveVenues from './ActiveVenues';
 import FlaggedVenues from './FlaggedVenues';
 import VenueCategories from './VenueCategories';
+import { VenueQualityScoring } from './VenueQualityScoring';
 
 const AdminVenues: React.FC = () => {
   return (
@@ -15,6 +16,7 @@ const AdminVenues: React.FC = () => {
         <Route path="active" element={<ActiveVenues />} />
         <Route path="flagged" element={<FlaggedVenues />} />
         <Route path="categories" element={<VenueCategories />} />
+        <Route path="quality" element={<VenueQualityScoring />} />
         <Route path="*" element={<Navigate to="pending" replace />} />
       </Routes>
     </div>

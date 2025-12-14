@@ -534,12 +534,16 @@ export type Database = {
           full_name: string | null
           id: string
           is_suspended: boolean | null
+          is_verified: boolean | null
           phone: string | null
           suspended_at: string | null
           suspended_by: string | null
           suspended_reason: string | null
           updated_at: string | null
           user_role: Database["public"]["Enums"]["user_role"] | null
+          verification_documents: Json | null
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -549,12 +553,16 @@ export type Database = {
           full_name?: string | null
           id: string
           is_suspended?: boolean | null
+          is_verified?: boolean | null
           phone?: string | null
           suspended_at?: string | null
           suspended_by?: string | null
           suspended_reason?: string | null
           updated_at?: string | null
           user_role?: Database["public"]["Enums"]["user_role"] | null
+          verification_documents?: Json | null
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -564,12 +572,16 @@ export type Database = {
           full_name?: string | null
           id?: string
           is_suspended?: boolean | null
+          is_verified?: boolean | null
           phone?: string | null
           suspended_at?: string | null
           suspended_by?: string | null
           suspended_reason?: string | null
           updated_at?: string | null
           user_role?: Database["public"]["Enums"]["user_role"] | null
+          verification_documents?: Json | null
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: []
       }
@@ -934,12 +946,15 @@ export type Database = {
           host_id: string
           id: string
           is_active: boolean | null
+          last_quality_check: string | null
           latitude: number | null
           longitude: number | null
           name: string
           price_per_day: number | null
           price_per_event: number | null
           price_per_hour: number | null
+          quality_notes: string | null
+          quality_score: number | null
           updated_at: string
         }
         Insert: {
@@ -953,12 +968,15 @@ export type Database = {
           host_id: string
           id?: string
           is_active?: boolean | null
+          last_quality_check?: string | null
           latitude?: number | null
           longitude?: number | null
           name: string
           price_per_day?: number | null
           price_per_event?: number | null
           price_per_hour?: number | null
+          quality_notes?: string | null
+          quality_score?: number | null
           updated_at?: string
         }
         Update: {
@@ -972,12 +990,15 @@ export type Database = {
           host_id?: string
           id?: string
           is_active?: boolean | null
+          last_quality_check?: string | null
           latitude?: number | null
           longitude?: number | null
           name?: string
           price_per_day?: number | null
           price_per_event?: number | null
           price_per_hour?: number | null
+          quality_notes?: string | null
+          quality_score?: number | null
           updated_at?: string
         }
         Relationships: []
@@ -987,6 +1008,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_venue_quality_score: {
+        Args: { venue_uuid: string }
+        Returns: number
+      }
       get_admin_role: { Args: { user_id: string }; Returns: string }
       is_admin: { Args: { user_id: string }; Returns: boolean }
     }
