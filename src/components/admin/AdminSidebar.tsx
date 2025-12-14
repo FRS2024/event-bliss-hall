@@ -13,7 +13,11 @@ import {
   Flag,
   Ticket,
   UserCheck,
-  MapPin
+  MapPin,
+  Activity,
+  Star,
+  CheckCircle,
+  Layers
 } from 'lucide-react';
 import {
   Sidebar,
@@ -44,6 +48,18 @@ const AdminSidebar: React.FC = () => {
       roles: ['super_admin', 'platform_manager', 'analyst']
     },
     {
+      title: 'Activity Feed',
+      icon: Activity,
+      path: '/admin/activity',
+      roles: ['super_admin', 'platform_manager']
+    },
+    {
+      title: 'Bulk Operations',
+      icon: Layers,
+      path: '/admin/operations',
+      roles: ['super_admin', 'platform_manager']
+    },
+    {
       title: 'Users',
       icon: Users,
       roles: ['super_admin', 'platform_manager', 'support_agent'],
@@ -51,6 +67,7 @@ const AdminSidebar: React.FC = () => {
         { title: 'All Users', path: '/admin/users', icon: Users },
         { title: 'Hosts', path: '/admin/users/hosts', icon: UserCheck },
         { title: 'Guests', path: '/admin/users/guests', icon: Users },
+        { title: 'Verification', path: '/admin/users/verification', icon: CheckCircle },
         { title: 'User Analytics', path: '/admin/users/analytics', icon: BarChart3 },
       ]
     },
@@ -62,6 +79,7 @@ const AdminSidebar: React.FC = () => {
         { title: 'Pending Approval', path: '/admin/venues/pending', icon: Building2 },
         { title: 'Active Venues', path: '/admin/venues/active', icon: MapPin },
         { title: 'Flagged Venues', path: '/admin/venues/flagged', icon: Flag },
+        { title: 'Quality Scores', path: '/admin/venues/quality', icon: Star },
         { title: 'Categories', path: '/admin/venues/categories', icon: Settings },
       ]
     },
