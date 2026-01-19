@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,6 +9,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Building2, CheckCircle, XCircle, Eye, MapPin, Users } from 'lucide-react';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useToast } from '@/hooks/use-toast';
+import { usePagination } from '@/hooks/usePagination';
+import TablePagination from '../shared/TablePagination';
 
 interface PendingVenue {
   id: string;
@@ -36,6 +37,7 @@ const VenuePendingApproval: React.FC = () => {
   const { hasPermission } = useAdminAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [itemsPerPage, setItemsPerPage] = React.useState(10);
 
   const { data: pendingVenues, isLoading, error } = useQuery({
     queryKey: ['admin-pending-venues'],
@@ -78,6 +80,11 @@ const VenuePendingApproval: React.FC = () => {
       return venuesWithDetails as PendingVenue[];
     },
     enabled: hasPermission(['super_admin', 'platform_manager']),
+  });
+
+  const pagination = usePagination({
+    data: pendingVenues,
+    itemsPerPage,
   });
 
   const approveMutation = useMutation({
@@ -240,7 +247,7 @@ const VenuePendingApproval: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pendingVenues?.map((venue) => (
+                {pagination.paginatedData?.map((venue) => (
                   <TableRow key={venue.id}>
                     <TableCell>
                       <div className="flex items-center space-x-3">
@@ -325,6 +332,23 @@ const VenuePendingApproval: React.FC = () => {
                 ))}
               </TableBody>
             </Table>
+
+            <TablePagination
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              startIndex={pagination.startIndex}
+              endIndex={pagination.endIndex}
+              totalItems={pagination.totalItems}
+              onPageChange={pagination.setCurrentPage}
+              onFirstPage={pagination.goToFirstPage}
+              onLastPage={pagination.goToLastPage}
+              onNextPage={pagination.goToNextPage}
+              onPreviousPage={pagination.goToPreviousPage}
+              canGoNext={pagination.canGoNext}
+              canGoPrevious={pagination.canGoPrevious}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
           </CardContent>
         </Card>
       )}
