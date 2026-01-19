@@ -1,15 +1,15 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Building2, Search, Users, MapPin, Calendar } from 'lucide-react';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { usePagination } from '@/hooks/usePagination';
+import TablePagination from '../shared/TablePagination';
 
 interface HostProfile {
   id: string;
@@ -26,6 +26,7 @@ interface HostProfile {
 const HostUsers: React.FC = () => {
   const { hasPermission } = useAdminAuth();
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [itemsPerPage, setItemsPerPage] = React.useState(10);
 
   const { data: hosts, isLoading, error } = useQuery({
     queryKey: ['admin-host-users', searchTerm],
@@ -70,6 +71,11 @@ const HostUsers: React.FC = () => {
       return hostProfiles as HostProfile[];
     },
     enabled: hasPermission(['super_admin', 'platform_manager']),
+  });
+
+  const pagination = usePagination({
+    data: hosts,
+    itemsPerPage,
   });
 
   if (!hasPermission(['super_admin', 'platform_manager'])) {
@@ -235,7 +241,7 @@ const HostUsers: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {hosts?.map((host) => (
+              {pagination.paginatedData?.map((host) => (
                 <TableRow key={host.id}>
                   <TableCell className="flex items-center space-x-3">
                     <Avatar className="h-8 w-8">
@@ -278,6 +284,23 @@ const HostUsers: React.FC = () => {
               ))}
             </TableBody>
           </Table>
+
+          <TablePagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            startIndex={pagination.startIndex}
+            endIndex={pagination.endIndex}
+            totalItems={pagination.totalItems}
+            onPageChange={pagination.setCurrentPage}
+            onFirstPage={pagination.goToFirstPage}
+            onLastPage={pagination.goToLastPage}
+            onNextPage={pagination.goToNextPage}
+            onPreviousPage={pagination.goToPreviousPage}
+            canGoNext={pagination.canGoNext}
+            canGoPrevious={pagination.canGoPrevious}
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={setItemsPerPage}
+          />
         </CardContent>
       </Card>
     </div>

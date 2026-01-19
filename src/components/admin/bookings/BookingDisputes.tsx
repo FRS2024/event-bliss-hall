@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,18 +5,26 @@ import { Input } from '@/components/ui/input';
 import { AlertTriangle } from 'lucide-react';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useBookingDisputes } from './hooks/useBookingDisputes';
+import { usePagination } from '@/hooks/usePagination';
 import DisputeMetricsCards from './components/DisputeMetricsCards';
 import DisputesTable from './components/DisputesTable';
+import TablePagination from '../shared/TablePagination';
 import { calculateDisputeMetrics } from './utils/disputeUtils';
 
 const BookingDisputes: React.FC = () => {
   const { hasPermission } = useAdminAuth();
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [itemsPerPage, setItemsPerPage] = React.useState(10);
 
   const { data: disputes, isLoading, error } = useBookingDisputes(
     searchTerm, 
     hasPermission(['super_admin', 'platform_manager', 'support_agent'])
   );
+
+  const pagination = usePagination({
+    data: disputes,
+    itemsPerPage,
+  });
 
   if (!hasPermission(['super_admin', 'platform_manager', 'support_agent'])) {
     return (
@@ -97,7 +104,24 @@ const BookingDisputes: React.FC = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <DisputesTable disputes={disputes || []} />
+          <DisputesTable disputes={pagination.paginatedData || []} />
+          
+          <TablePagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            startIndex={pagination.startIndex}
+            endIndex={pagination.endIndex}
+            totalItems={pagination.totalItems}
+            onPageChange={pagination.setCurrentPage}
+            onFirstPage={pagination.goToFirstPage}
+            onLastPage={pagination.goToLastPage}
+            onNextPage={pagination.goToNextPage}
+            onPreviousPage={pagination.goToPreviousPage}
+            canGoNext={pagination.canGoNext}
+            canGoPrevious={pagination.canGoPrevious}
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={setItemsPerPage}
+          />
         </CardContent>
       </Card>
     </div>

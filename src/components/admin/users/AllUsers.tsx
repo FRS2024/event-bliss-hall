@@ -6,9 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Users, UserCheck, Calendar, MoreHorizontal, Ban } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Users, UserCheck, Ban, MoreHorizontal, Search } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { usePagination } from '@/hooks/usePagination';
+import TablePagination from '../shared/TablePagination';
 import UserProfileModal from '../modals/UserProfileModal';
 
 interface UserProfile {
@@ -25,19 +28,32 @@ const AllUsers: React.FC = () => {
   const { hasPermission } = useAdminAuth();
   const [selectedUserId, setSelectedUserId] = React.useState<string | null>(null);
   const [profileModalOpen, setProfileModalOpen] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [itemsPerPage, setItemsPerPage] = React.useState(10);
   
   const { data: users, isLoading, error } = useQuery({
-    queryKey: ['admin-all-users'],
+    queryKey: ['admin-all-users', searchTerm],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
+      
+      if (searchTerm) {
+        query = query.or(`full_name.ilike.%${searchTerm}%,business_name.ilike.%${searchTerm}%`);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return data as UserProfile[];
     },
     enabled: hasPermission(['super_admin', 'platform_manager']),
+  });
+
+  const pagination = usePagination({
+    data: users,
+    itemsPerPage,
   });
 
   const handleViewProfile = (userId: string) => {
@@ -125,7 +141,20 @@ const AllUsers: React.FC = () => {
       </div>
 
       <Card>
-        <CardHeader><CardTitle>User Directory</CardTitle></CardHeader>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle>User Directory</CardTitle>
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search users..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-8 w-64"
+              />
+            </div>
+          </div>
+        </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
@@ -139,7 +168,7 @@ const AllUsers: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users?.map((user) => (
+              {pagination.paginatedData?.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell className="flex items-center space-x-3">
                     <Avatar className="h-8 w-8">
@@ -179,6 +208,23 @@ const AllUsers: React.FC = () => {
               ))}
             </TableBody>
           </Table>
+
+          <TablePagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            startIndex={pagination.startIndex}
+            endIndex={pagination.endIndex}
+            totalItems={pagination.totalItems}
+            onPageChange={pagination.setCurrentPage}
+            onFirstPage={pagination.goToFirstPage}
+            onLastPage={pagination.goToLastPage}
+            onNextPage={pagination.goToNextPage}
+            onPreviousPage={pagination.goToPreviousPage}
+            canGoNext={pagination.canGoNext}
+            canGoPrevious={pagination.canGoPrevious}
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={setItemsPerPage}
+          />
         </CardContent>
       </Card>
 

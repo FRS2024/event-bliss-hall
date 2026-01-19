@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar, Users, DollarSign, Clock } from 'lucide-react';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useAllBookings } from './hooks/useAllBookings';
+import { usePagination } from '@/hooks/usePagination';
+import TablePagination from '../shared/TablePagination';
 import BookingDetailModal from '../modals/BookingDetailModal';
 
 const AllBookings: React.FC = () => {
@@ -16,12 +18,18 @@ const AllBookings: React.FC = () => {
   const { hasPermission } = useAdminAuth();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState('all');
+  const [itemsPerPage, setItemsPerPage] = React.useState(10);
 
   const { data: bookings, isLoading, error } = useAllBookings(
     searchTerm,
     statusFilter,
     hasPermission(['super_admin', 'platform_manager', 'support_agent'])
   );
+
+  const pagination = usePagination({
+    data: bookings,
+    itemsPerPage,
+  });
 
   if (!hasPermission(['super_admin', 'platform_manager', 'support_agent'])) {
     return (
@@ -198,7 +206,7 @@ const AllBookings: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {bookings?.map((booking) => (
+              {pagination.paginatedData?.map((booking) => (
                 <TableRow key={booking.id}>
                   <TableCell>
                     <div className="font-mono text-sm">
@@ -255,6 +263,23 @@ const AllBookings: React.FC = () => {
               ))}
             </TableBody>
           </Table>
+          
+          <TablePagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            startIndex={pagination.startIndex}
+            endIndex={pagination.endIndex}
+            totalItems={pagination.totalItems}
+            onPageChange={pagination.setCurrentPage}
+            onFirstPage={pagination.goToFirstPage}
+            onLastPage={pagination.goToLastPage}
+            onNextPage={pagination.goToNextPage}
+            onPreviousPage={pagination.goToPreviousPage}
+            canGoNext={pagination.canGoNext}
+            canGoPrevious={pagination.canGoPrevious}
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={setItemsPerPage}
+          />
         </CardContent>
       </Card>
 
