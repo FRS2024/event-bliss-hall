@@ -297,6 +297,42 @@ export type Database = {
         }
         Relationships: []
       }
+      content_pages: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          is_published: boolean | null
+          last_updated_by: string | null
+          meta_description: string | null
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          last_updated_by?: string | null
+          meta_description?: string | null
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          last_updated_by?: string | null
+          meta_description?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           booking_id: string | null
@@ -375,6 +411,39 @@ export type Database = {
         }
         Relationships: []
       }
+      faqs: {
+        Row: {
+          answer: string
+          category: string
+          created_at: string
+          display_order: number | null
+          id: string
+          is_published: boolean | null
+          question: string
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          category?: string
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_published?: boolean | null
+          question: string
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          category?: string
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_published?: boolean | null
+          question?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       flagged_content: {
         Row: {
           admin_id: string | null
@@ -427,6 +496,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      homepage_sections: {
+        Row: {
+          background_image: string | null
+          content: Json
+          id: string
+          is_active: boolean | null
+          section_key: string
+          subtitle: string | null
+          title: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          background_image?: string | null
+          content?: Json
+          id?: string
+          is_active?: boolean | null
+          section_key: string
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          background_image?: string | null
+          content?: Json
+          id?: string
+          is_active?: boolean | null
+          section_key?: string
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
       }
       messages: {
         Row: {
@@ -637,6 +742,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      testimonials: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          is_featured: boolean | null
+          name: string
+          quote: string
+          rating: number
+          role: string
+          updated_at: string
+          venue_name: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          name: string
+          quote: string
+          rating?: number
+          role?: string
+          updated_at?: string
+          venue_name?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          name?: string
+          quote?: string
+          rating?: number
+          role?: string
+          updated_at?: string
+          venue_name?: string | null
+        }
+        Relationships: []
       }
       ticket_responses: {
         Row: {
