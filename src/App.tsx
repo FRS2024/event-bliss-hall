@@ -25,6 +25,7 @@ import ContactPage from "./pages/ContactPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import CookiePolicyPage from "./pages/CookiePolicyPage";
+import FAQPage from "./pages/FAQPage";
 import NotFound from "./pages/NotFound";
 import AdminDashboardPage from '@/pages/AdminDashboardPage';
 
@@ -50,6 +51,7 @@ function App() {
               <Route path="/terms" element={<TermsOfServicePage />} />
               <Route path="/privacy" element={<PrivacyPolicyPage />} />
               <Route path="/cookies" element={<CookiePolicyPage />} />
+              <Route path="/faq" element={<FAQPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/select-role" element={<RoleSelectionPage />} />
