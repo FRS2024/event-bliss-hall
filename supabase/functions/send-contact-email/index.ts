@@ -17,6 +17,16 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// HTML escape function to prevent XSS attacks
+const escapeHtml = (text: string): string => {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
 interface ContactFormData {
   name: string;
   email: string;
@@ -84,20 +94,26 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Sending admin notification email...");
 
+    // Sanitize all user inputs to prevent XSS attacks
+    const safeName = escapeHtml(name);
+    const safeEmail = escapeHtml(email);
+    const safeSubject = escapeHtml(subject);
+    const safeMessage = escapeHtml(message).replace(/\n/g, '<br>');
+
     // Send notification email to admin (using verified email address)
     const adminEmailResponse = await resend.emails.send({
       from: "EasyHall Contact <onboarding@resend.dev>",
       to: ["boudra.fares20@gmail.com"], // Using your verified email address
-      subject: `New Contact Form: ${subject}`,
+      subject: `New Contact Form: ${safeSubject}`,
       html: `
         <h2>New Contact Form Submission</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Subject:</strong> ${subject}</p>
+        <p><strong>Name:</strong> ${safeName}</p>
+        <p><strong>Email:</strong> ${safeEmail}</p>
+        <p><strong>Subject:</strong> ${safeSubject}</p>
         <h3>Message:</h3>
-        <p>${message.replace(/\n/g, '<br>')}</p>
+        <p>${safeMessage}</p>
         <hr>
-        <p><em>Reply to: ${email}</em></p>
+        <p><em>Reply to: ${safeEmail}</em></p>
       `,
     });
 
@@ -116,11 +132,11 @@ const handler = async (req: Request): Promise<Response> => {
       to: [email],
       subject: "Thank you for contacting EasyHall",
       html: `
-        <h1>Thank you for reaching out, ${name}!</h1>
-        <p>We have received your message about "${subject}" and will get back to you within 24 hours.</p>
+        <h1>Thank you for reaching out, ${safeName}!</h1>
+        <p>We have received your message about "${safeSubject}" and will get back to you within 24 hours.</p>
         <p>Your message:</p>
         <blockquote style="border-left: 4px solid #e5e7eb; padding-left: 16px; margin: 16px 0; color: #6b7280;">
-          ${message.replace(/\n/g, '<br>')}
+          ${safeMessage}
         </blockquote>
         <p>Best regards,<br>The EasyHall Team</p>
         <hr>
