@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 
 export interface ContentSection {
   title: string;
@@ -77,9 +78,18 @@ export const useCreateContentPage = () => {
   
   return useMutation({
     mutationFn: async (page: Omit<ContentPage, 'id' | 'created_at' | 'updated_at'>) => {
+      const insertData = {
+        slug: page.slug,
+        title: page.title,
+        content: page.content as unknown as Json,
+        meta_description: page.meta_description,
+        is_published: page.is_published,
+        last_updated_by: page.last_updated_by,
+      };
+      
       const { data, error } = await supabase
         .from('content_pages')
-        .insert(page as unknown as Record<string, unknown>)
+        .insert([insertData])
         .select()
         .single();
       
