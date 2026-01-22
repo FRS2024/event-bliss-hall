@@ -11,6 +11,7 @@ import AdminCommunications from './communications/AdminCommunications';
 import AdminSettings from './settings/AdminSettings';
 import { BulkOperations } from './operations/BulkOperations';
 import { RealTimeActivityFeed } from './activity/RealTimeActivityFeed';
+import AdminContentRoutes from './content/AdminContentRoutes';
 
 const AdminContent: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ const AdminContent: React.FC = () => {
         <Route path="users/*" element={<AdminUsers />} />
         <Route path="venues/*" element={<AdminVenues />} />
         <Route path="bookings/*" element={<AdminBookings />} />
+        <Route path="content/*" element={<AdminContentRoutes />} />
         <Route path="moderation/*" element={<AdminModeration />} />
         <Route path="analytics/*" element={<AdminAnalytics />} />
         <Route path="communications/*" element={<AdminCommunications />} />

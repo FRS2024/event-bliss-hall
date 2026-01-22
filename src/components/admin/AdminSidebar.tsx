@@ -17,7 +17,11 @@ import {
   Activity,
   Star,
   CheckCircle,
-  Layers
+  Layers,
+  FileText,
+  MessageSquareQuote,
+  HelpCircle,
+  Layout
 } from 'lucide-react';
 import {
   Sidebar,
@@ -30,7 +34,6 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarGroupContent,
 } from '@/components/ui/sidebar';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -92,6 +95,17 @@ const AdminSidebar: React.FC = () => {
         { title: 'Disputes', path: '/admin/bookings/disputes', icon: Shield },
         { title: 'Revenue', path: '/admin/bookings/revenue', icon: BarChart3 },
         { title: 'Analytics', path: '/admin/bookings/analytics', icon: BarChart3 },
+      ]
+    },
+    {
+      title: 'Content',
+      icon: FileText,
+      roles: ['super_admin', 'platform_manager', 'content_moderator'],
+      submenu: [
+        { title: 'Legal Pages', path: '/admin/content/pages', icon: FileText },
+        { title: 'Testimonials', path: '/admin/content/testimonials', icon: MessageSquareQuote },
+        { title: 'FAQs', path: '/admin/content/faqs', icon: HelpCircle },
+        { title: 'Homepage', path: '/admin/content/homepage', icon: Layout },
       ]
     },
     {

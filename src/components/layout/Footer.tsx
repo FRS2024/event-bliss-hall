@@ -90,6 +90,11 @@ const Footer: React.FC = () => {
                   {t('footer.cookiePolicy')}
                 </ScrollLink>
               </li>
+              <li>
+                <ScrollLink to="/faq" className="text-muted-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
+                  {t('footer.faq', 'FAQ')}
+                </ScrollLink>
+              </li>
             </ul>
           </div>
         </div>
