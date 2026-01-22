@@ -60,6 +60,9 @@ const Carousel = React.forwardRef<
       {
         ...opts,
         axis: orientation === "horizontal" ? "x" : "y",
+        watchDrag: true,
+        watchResize: false, // Disable resize watching to reduce reflows
+        watchSlides: false, // Disable slide watching to reduce reflows
       },
       plugins
     )
@@ -155,11 +158,11 @@ const CarouselContent = React.forwardRef<
   const { carouselRef, orientation } = useCarousel()
 
   return (
-    <div ref={carouselRef} className="overflow-hidden">
+    <div ref={carouselRef} className="overflow-hidden" style={{ contain: 'layout style' }}>
       <div
         ref={ref}
         className={cn(
-          "flex",
+          "flex will-change-transform",
           orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
           className
         )}
