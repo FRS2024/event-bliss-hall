@@ -58,26 +58,26 @@ const VenueCard: React.FC<VenueCardProps> = ({ venue }) => {
               size="icon"
               onClick={goToPrevImage}
               className={cn(
-                "absolute left-2 top-1/2 -translate-y-1/2 z-20",
+                "absolute start-2 top-1/2 -translate-y-1/2 z-20",
                 "w-8 h-8 rounded-full bg-white/90 dark:bg-black/70 backdrop-blur-sm shadow-md",
                 "text-foreground hover:bg-white dark:hover:bg-black/90",
                 "opacity-0 group-hover:opacity-100 transition-all duration-300"
               )}
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
               onClick={goToNextImage}
               className={cn(
-                "absolute right-2 top-1/2 -translate-y-1/2 z-20",
+                "absolute end-2 top-1/2 -translate-y-1/2 z-20",
                 "w-8 h-8 rounded-full bg-white/90 dark:bg-black/70 backdrop-blur-sm shadow-md",
                 "text-foreground hover:bg-white dark:hover:bg-black/90",
                 "opacity-0 group-hover:opacity-100 transition-all duration-300"
               )}
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4 rtl:rotate-180" />
             </Button>
           </>
         )}
@@ -110,7 +110,7 @@ const VenueCard: React.FC<VenueCardProps> = ({ venue }) => {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute top-2 right-2 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full z-10 hover:bg-white dark:hover:bg-black/70"
+          className="absolute top-2 end-2 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full z-10 hover:bg-white dark:hover:bg-black/70"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -123,7 +123,7 @@ const VenueCard: React.FC<VenueCardProps> = ({ venue }) => {
           />
         </Button>
         
-        <div className="absolute bottom-3 left-3 z-10">
+        <div className="absolute bottom-3 start-3 z-10">
           <span className="category-tag">{venue.category}</span>
         </div>
       </div>
@@ -134,23 +134,23 @@ const VenueCard: React.FC<VenueCardProps> = ({ venue }) => {
             <h3 className="font-script text-xl text-foreground hover:text-blush-500 transition-colors">{venue.name}</h3>
           </Link>
           <div className="flex items-center">
-            <Star size={16} className="text-champagne-500 mr-1" />
+            <Star size={16} className="text-champagne-500 me-1" />
             <span className="text-sm font-medium">{venue.rating}</span>
           </div>
         </div>
         
         <div className="flex items-center text-muted-foreground mb-3">
-          <MapPin size={16} className="mr-1" />
+          <MapPin size={16} className="me-1" />
           <span className="text-sm truncate">{venue.city}</span>
         </div>
         
-        <div className="flex items-center space-x-4 mb-4 text-sm text-muted-foreground">
+        <div className="flex items-center gap-4 mb-4 text-sm text-muted-foreground">
           <div className="flex items-center">
-            <Users size={16} className="mr-1" />
+            <Users size={16} className="me-1" />
             <span>Up to {venue.capacity} guests</span>
           </div>
           <div className="flex items-center">
-            <Calendar size={16} className="mr-1" />
+            <Calendar size={16} className="me-1" />
             <span>{venue.availability}</span>
           </div>
         </div>

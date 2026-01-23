@@ -147,7 +147,7 @@ const DualMonthCalendar: React.FC<DualMonthCalendarProps> = ({
           disabled={!canGoPrevious}
           className="h-8 w-8 rounded-full hover:bg-accent disabled:opacity-30"
         >
-          <ChevronLeft className="h-5 w-5" />
+          <ChevronLeft className="h-5 w-5 rtl:rotate-180" />
         </Button>
 
         <div className="flex-1" />
@@ -158,7 +158,7 @@ const DualMonthCalendar: React.FC<DualMonthCalendarProps> = ({
           onClick={handleNextMonth}
           className="h-8 w-8 rounded-full hover:bg-accent"
         >
-          <ChevronRight className="h-5 w-5" />
+          <ChevronRight className="h-5 w-5 rtl:rotate-180" />
         </Button>
       </div>
 
