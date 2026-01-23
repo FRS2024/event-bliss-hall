@@ -95,15 +95,15 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
           
           <div className="space-y-2">
             <div className="flex items-center text-sm transition-all duration-300 group-hover:translate-x-1">
-              <Building size={16} className="mr-2 text-blush-400 group-hover:text-blush-500 transition-colors duration-300" />
+              <Building size={16} className="me-2 text-blush-400 group-hover:text-blush-500 transition-colors duration-300" />
               <span className="font-medium">{venueCount}</span>
-              <span className="text-muted-foreground ml-1">
+              <span className="text-muted-foreground ms-1">
                 {venueCount === 1 ? 'venue' : 'venues'}
               </span>
             </div>
             
             <div className="flex items-center text-sm transition-all duration-300 group-hover:translate-x-1">
-              <DollarSign size={16} className="mr-2 text-champagne-500 group-hover:text-champagne-600 transition-colors duration-300" />
+              <DollarSign size={16} className="me-2 text-champagne-500 group-hover:text-champagne-600 transition-colors duration-300" />
               <span className="text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">{priceRange}</span>
             </div>
           </div>
@@ -119,7 +119,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
             Explore {category}
             <ArrowRight 
               size={16} 
-              className="transition-all duration-300 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0" 
+              className="transition-all duration-300 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 rtl:rotate-180 rtl:translate-x-2 rtl:group-hover:-translate-x-0" 
             />
           </span>
         </Button>

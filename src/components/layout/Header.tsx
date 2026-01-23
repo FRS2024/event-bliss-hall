@@ -29,7 +29,7 @@ const Header: React.FC = () => {
           </Link>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-6 items-center">
+          <nav className="hidden md:flex gap-6 items-center">
             <Link to="/venues" className="text-foreground hover:text-blush-500 dark:hover:text-blush-400 transition-colors">
               {t('nav.venues')}
             </Link>
@@ -45,7 +45,7 @@ const Header: React.FC = () => {
           </nav>
           
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center gap-4">
             <Button variant="ghost" size="icon" className="text-foreground">
               <Search size={20} />
             </Button>
@@ -70,7 +70,7 @@ const Header: React.FC = () => {
           </div>
           
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-2">
+          <div className="md:hidden flex items-center gap-2">
             {user && (
               <Button
                 variant="ghost"
@@ -138,7 +138,7 @@ const Header: React.FC = () => {
                     {t('nav.myBookings')}
                   </Link>
                   <Link to="/messages" className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors flex items-center" onClick={() => setIsOpen(false)}>
-                    <MessageSquare className="h-4 w-4 mr-2" />
+                    <MessageSquare className="h-4 w-4 me-2" />
                     {t('nav.messages')}
                   </Link>
                   <Link to="/settings" className="px-4 py-2 rounded-md hover:bg-blush-50 dark:hover:bg-blush-900/20 transition-colors" onClick={() => setIsOpen(false)}>
