@@ -22,8 +22,12 @@
     "welcomeDescriptionGuest": "Select a conversation from the sidebar to chat with hosts about venues you're interested in."
   },
   "hero": {
-    "title": "Find Your Perfect Celebration Venue",
-    "subtitle": "Discover beautiful spaces for weddings, birthdays, corporate events and special occasions. Book with confidence and celebrate in style."
+    "title": "Find Your Perfect",
+    "titleAccent": "Celebration Venue",
+    "subtitle": "Discover beautiful spaces for weddings, birthdays, corporate events and special occasions. Book with confidence and celebrate in style.",
+    "locationPlaceholder": "City (e.g., Algiers, Oran)",
+    "eventDate": "Event Date",
+    "searchNow": "Search Now"
   },
   "home": {
     "featuredVenues": "Featured Venues",
@@ -34,7 +38,13 @@
     "bookDate": "Book Your Date",
     "bookDateDesc": "Select your date, review venue details, and secure your booking online.",
     "celebrate": "Celebrate!",
-    "celebrateDesc": "Enjoy your special day in a perfect venue that matches your vision."
+    "celebrateDesc": "Enjoy your special day in a perfect venue that matches your vision.",
+    "stats": {
+      "happyHosts": "Happy Hosts",
+      "bookingsMade": "Bookings Made",
+      "satisfaction": "Satisfaction",
+      "hostEarnings": "Host Earnings"
+    }
   },
   "howItWorks": {
     "title": "How EasyHall Works",
@@ -79,8 +89,13 @@
     "subtitle": "Discover amazing venues for your special events",
     "viewDetails": "View Details",
     "bookNow": "Book Now",
+    "bookThisVenue": "Book This Venue",
     "contactHost": "Contact Host",
     "upToGuests": "Up to {{count}} guests",
+    "from": "From",
+    "perDay": "/day",
+    "perHour": "/hr",
+    "perEvent": "/event",
     "rating": "Rating",
     "pricePerDay": "{{price}} DA/day",
     "pricePerHour": "{{price}} DA/hr",
@@ -105,11 +120,15 @@
     "party": "Party",
     "other": "Other Events",
     "reception": "Reception",
+    "engagement": "Engagement",
     "searchPlaceholder": "Search categories...",
     "viewVenues": "View Venues"
   },
   "filters": {
     "title": "Filters",
+    "open": "Open Filters",
+    "close": "Close Filters",
+    "searchPlaceholder": "Search venues...",
     "location": "Location",
     "priceRange": "Price Range",
     "capacity": "Capacity",

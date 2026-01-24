@@ -1,30 +1,47 @@
-
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import VenueCard from './VenueCard';
 import { Venue } from '@/types';
+import EmptyState from '@/components/ui/EmptyState';
 
 interface VenueGridProps {
   venues: Venue[];
   isLoading?: boolean;
+  onClearFilters?: () => void;
 }
 
-const VenueGrid: React.FC<VenueGridProps> = ({ venues, isLoading = false }) => {
+const VenueGrid: React.FC<VenueGridProps> = ({ venues, isLoading = false, onClearFilters }) => {
+  const { t } = useTranslation();
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {Array.from({ length: 6 }).map((_, index) => (
           <div 
             key={index} 
-            className="venue-card animate-pulse"
+            className="venue-card overflow-hidden"
           >
-            <div className="bg-gray-200 dark:bg-gray-700 h-60 w-full rounded-t-lg" />
-            <div className="p-4">
-              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2" />
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-3" />
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-4" />
-              <div className="flex justify-between items-center">
-                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4" />
-                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
+            {/* Image skeleton with shimmer */}
+            <div className="relative h-60 w-full rounded-t-lg overflow-hidden">
+              <div className="absolute inset-0 animate-shimmer" />
+            </div>
+            {/* Content skeleton */}
+            <div className="p-4 space-y-3">
+              <div className="flex justify-between items-start">
+                <div className="h-6 bg-muted rounded w-3/4 animate-shimmer" />
+                <div className="h-5 bg-muted rounded w-12 animate-shimmer" />
+              </div>
+              <div className="h-4 bg-muted rounded w-1/2 animate-shimmer" />
+              <div className="h-4 bg-muted rounded w-2/3 animate-shimmer" />
+              {/* Price block skeleton */}
+              <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+                <div className="h-6 bg-muted rounded w-1/2 animate-shimmer" />
+                <div className="h-5 bg-muted rounded w-24 animate-shimmer" />
+              </div>
+              {/* Button skeletons */}
+              <div className="space-y-2">
+                <div className="h-11 bg-muted rounded animate-shimmer" />
+                <div className="h-11 bg-muted rounded animate-shimmer" />
               </div>
             </div>
           </div>
@@ -35,10 +52,19 @@ const VenueGrid: React.FC<VenueGridProps> = ({ venues, isLoading = false }) => {
   
   if (venues.length === 0) {
     return (
-      <div className="elegant-card text-center py-12">
-        <h3 className="font-script text-2xl mb-4 text-blush-500 dark:text-blush-400">No Venues Found</h3>
-        <p className="text-muted-foreground mb-6">Try adjusting your search filters or browse all venues.</p>
-      </div>
+      <EmptyState
+        type="no-results"
+        title={t('venues.noResults', 'No venues match your search')}
+        description={t('venues.tryAdjusting', 'Try adjusting your filters to find what you\'re looking for.')}
+        primaryAction={onClearFilters ? {
+          label: t('filters.clearAll', 'Clear All Filters'),
+          onClick: onClearFilters
+        } : undefined}
+        secondaryAction={{
+          label: t('home.viewAllVenues', 'View All Venues'),
+          onClick: () => window.location.href = '/venues'
+        }}
+      />
     );
   }
 
