@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Search, Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { VENUE_CATEGORIES, VENUE_FEATURES } from '@/constants/venue';
+import { useTranslation } from 'react-i18next';
 
 interface VenueFiltersProps {
   onFilter: (filters: any) => void;
 }
 
 const VenueFilters: React.FC<VenueFiltersProps> = ({ onFilter }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 500000]);
   const [capacity, setCapacity] = useState([0, 1000]);
@@ -95,45 +97,46 @@ const VenueFilters: React.FC<VenueFiltersProps> = ({ onFilter }) => {
   
   return (
     <div className="bg-white dark:bg-card rounded-lg shadow-md border border-champagne-100 dark:border-champagne-900/40 mb-8">
-      {/* Mobile Filter Toggle */}
+      {/* Mobile Filter Toggle - Improved touch target (min 44px) */}
       <div className="md:hidden p-4 border-b border-champagne-100 dark:border-champagne-900/40">
         <Button 
           variant="outline" 
-          className="w-full flex items-center justify-center border-blush-200 text-blush-500 dark:border-blush-800 dark:text-blush-400"
+          size="lg"
+          className="w-full min-h-[48px] flex items-center justify-center gap-2 border-blush-200 text-blush-500 dark:border-blush-800 dark:text-blush-400"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? (
             <>
-              <X size={18} className="mr-2" />
-              Close Filters
+              <X size={20} />
+              {t('filters.close', 'Close Filters')}
             </>
           ) : (
             <>
-              <Filter size={18} className="mr-2" />
-              Open Filters
+              <Filter size={20} />
+              {t('filters.open', 'Open Filters')}
             </>
           )}
         </Button>
       </div>
       
-      {/* Search Bar (Always Visible) */}
+      {/* Search Bar (Always Visible) - RTL-safe positioning */}
       <div className="p-4 border-b border-champagne-100 dark:border-champagne-900/40">
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
             <Search size={20} className="text-muted-foreground" />
           </div>
           <input
             type="text"
-            placeholder="Search venues..."
-            className="elegant-input pl-10 w-full"
+            placeholder={t('filters.searchPlaceholder', 'Search venues...')}
+            className="elegant-input ps-10 w-full min-h-[48px]"
             value={filters.search}
             onChange={handleSearch}
           />
         </div>
       </div>
       
-      {/* Filter Options */}
-      <div className={`${isOpen || window.innerWidth >= 768 ? 'block' : 'hidden'} md:block`}>
+      {/* Filter Options - SSR-safe visibility (no window.innerWidth) */}
+      <div className={`${isOpen ? 'block' : 'hidden'} md:block`}>
         <div className="p-4 border-b border-champagne-100 dark:border-champagne-900/40">
           <h3 className="font-medium mb-3">Venue Categories</h3>
           <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">

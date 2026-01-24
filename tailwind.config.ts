@@ -104,10 +104,11 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["Inter", "ui-sans-serif", "system-ui"],
+        sans: ["Inter", "Cairo", "ui-sans-serif", "system-ui"],
         serif: ["Georgia", "ui-serif"],
         script: ["'Playfair Display'", "serif"],
-        display: ["'Great Vibes'", "cursive"],
+        display: ["Inter", "Cairo", "ui-sans-serif", "system-ui"],
+        arabic: ["Cairo", "ui-sans-serif", "system-ui"],
       },
       borderRadius: {
         lg: "var(--radius)",
