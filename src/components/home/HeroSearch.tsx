@@ -128,12 +128,13 @@ const HeroSearch: React.FC<HeroSearchProps> = ({ onSearch }) => {
             </Popover>
           </div>
           
-          {/* Search Button */}
+          {/* Search Button with pulse animation */}
           <div>
             <Button 
               type="submit" 
               size="lg"
               className="w-full h-14 rounded-xl bg-blush-500 hover:bg-blush-600 text-white font-semibold text-base shadow-lg shadow-blush-500/25 hover:shadow-xl hover:shadow-blush-500/30 transition-all"
+              pulse
             >
               <Search size={20} className="me-2" />
               {t('hero.searchNow', 'Search Now')}

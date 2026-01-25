@@ -330,6 +330,14 @@
   animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Delayed CTA pulse - starts after 3 seconds to draw attention */
+.cta-pulse-delayed {
+  position: relative;
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation-delay: 3s;
+  animation-fill-mode: backwards;
+}
+
 /* Touch manipulation for better mobile UX */
 .touch-manipulation {
   touch-action: manipulation;
@@ -346,7 +354,8 @@
   .animate-pulse-soft,
   .animate-ken-burns,
   .animate-shimmer,
-  .animate-pulse-ring {
+  .animate-pulse-ring,
+  .cta-pulse-delayed {
     animation: none;
   }
   
