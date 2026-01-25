@@ -70,8 +70,9 @@ const VenueGrid: React.FC<VenueGridProps> = ({ venues, isLoading = false, onClea
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {venues.map((venue) => (
-        <VenueCard key={venue.id} venue={venue} />
+      {venues.map((venue, index) => (
+        // First 3 cards are likely above-the-fold, prioritize their images
+        <VenueCard key={venue.id} venue={venue} priority={index < 3} />
       ))}
     </div>
   );

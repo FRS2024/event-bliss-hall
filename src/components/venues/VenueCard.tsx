@@ -6,16 +6,26 @@ import { Venue } from '@/types';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import VerifiedBadge from '@/components/ui/VerifiedBadge';
+import { useLazyLoad } from '@/hooks/useLazyLoad';
 
 interface VenueCardProps {
   venue: Venue;
+  /** Force eager loading for above-the-fold cards */
+  priority?: boolean;
 }
 
-const VenueCard: React.FC<VenueCardProps> = ({ venue }) => {
+const VenueCard: React.FC<VenueCardProps> = ({ venue, priority = false }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  
+  // Lazy loading with Intersection Observer
+  const { ref: cardRef, isVisible, loadingStrategy } = useLazyLoad({ 
+    rootMargin: '300px', // Preload images 300px before they enter viewport
+    forceEager: priority 
+  });
   
   const images = venue.images || [];
   const hasMultipleImages = images.length > 1;
@@ -51,16 +61,32 @@ const VenueCard: React.FC<VenueCardProps> = ({ venue }) => {
   const price = priceDisplay();
   
   return (
-    <div className="venue-card group transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+    <div 
+      ref={cardRef}
+      className="venue-card group transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+    >
       <div className="relative overflow-hidden rounded-t-xl">
         <Link to={`/venues/${venue.id}`}>
-          <div className="relative aspect-[4/3] overflow-hidden">
-            <img
-              src={images[currentImageIndex] || '/placeholder.svg'}
-              alt={venue.name}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              loading="lazy"
-            />
+          <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+            {/* Placeholder skeleton while image loads */}
+            {!imageLoaded && (
+              <div className="absolute inset-0 animate-shimmer" />
+            )}
+            {/* Only render image when visible or already loaded */}
+            {isVisible && (
+              <img
+                src={images[currentImageIndex] || '/placeholder.svg'}
+                alt={venue.name}
+                className={cn(
+                  "w-full h-full object-cover transition-all duration-500 group-hover:scale-105",
+                  imageLoaded ? "opacity-100" : "opacity-0"
+                )}
+                loading={loadingStrategy}
+                decoding="async"
+                fetchPriority={loadingStrategy === 'eager' ? 'high' : 'auto'}
+                onLoad={() => setImageLoaded(true)}
+              />
+            )}
             <div className="image-overlay" />
           </div>
         </Link>
