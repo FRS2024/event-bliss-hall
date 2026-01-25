@@ -10,6 +10,7 @@ import { Venue } from '@/types';
 import { getFeaturedVenues } from '@/lib/api';
 import { useTranslation } from 'react-i18next';
 import { useRoleRedirect } from '@/hooks/useRoleRedirect';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 const Index: React.FC = () => {
   const [venues, setVenues] = useState<Venue[]>([]);
@@ -18,6 +19,13 @@ const Index: React.FC = () => {
   // Handle role selection redirect for OAuth users
   useRoleRedirect();
   const { t } = useTranslation();
+  
+  // Scroll reveal animations for each section
+  const featuredVenuesReveal = useScrollReveal({ threshold: 0.1 });
+  const howItWorksReveal = useScrollReveal({ threshold: 0.15 });
+  const step1Reveal = useScrollReveal({ threshold: 0.2 });
+  const step2Reveal = useScrollReveal({ threshold: 0.2 });
+  const step3Reveal = useScrollReveal({ threshold: 0.2 });
   
   useEffect(() => {
     // In a real application, this would fetch from your API
@@ -40,7 +48,15 @@ const Index: React.FC = () => {
     <MainLayout>
       <Hero />
       
-      <section className="page-container py-16">
+      {/* Featured Venues Section with scroll reveal */}
+      <section 
+        ref={featuredVenuesReveal.ref}
+        className={`page-container py-16 transition-all duration-700 ease-out ${
+          featuredVenuesReveal.isVisible 
+            ? 'opacity-100 translate-y-0' 
+            : 'opacity-0 translate-y-8'
+        }`}
+      >
         <h2 className="section-title">{t('home.featuredVenues')}</h2>
         <VenueGrid venues={venues} isLoading={isLoading} />
         <div className="flex justify-center mt-10">
@@ -55,12 +71,29 @@ const Index: React.FC = () => {
         </div>
       </section>
       
-      <section className="bg-champagne-50 dark:bg-champagne-900/20 py-16">
-        <div className="container mx-auto px-4">
+      {/* How It Works Section with scroll reveal */}
+      <section className="bg-champagne-50 dark:bg-champagne-900/20 py-16 overflow-hidden">
+        <div 
+          ref={howItWorksReveal.ref}
+          className={`container mx-auto px-4 transition-all duration-700 ease-out ${
+            howItWorksReveal.isVisible 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-8'
+          }`}
+        >
           <h2 className="section-title">{t('home.howItWorksTitle')}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10">
-            <div className="elegant-card text-center">
+            {/* Step 1 */}
+            <div 
+              ref={step1Reveal.ref}
+              className={`elegant-card text-center transition-all duration-500 ease-out ${
+                step1Reveal.isVisible 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-6'
+              }`}
+              style={{ transitionDelay: '100ms' }}
+            >
               <div className="w-16 h-16 bg-blush-100 dark:bg-blush-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="font-script text-2xl text-blush-500 dark:text-blush-400">1</span>
               </div>
@@ -70,7 +103,16 @@ const Index: React.FC = () => {
               </p>
             </div>
             
-            <div className="elegant-card text-center">
+            {/* Step 2 */}
+            <div 
+              ref={step2Reveal.ref}
+              className={`elegant-card text-center transition-all duration-500 ease-out ${
+                step2Reveal.isVisible 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-6'
+              }`}
+              style={{ transitionDelay: '200ms' }}
+            >
               <div className="w-16 h-16 bg-blush-100 dark:bg-blush-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="font-script text-2xl text-blush-500 dark:text-blush-400">2</span>
               </div>
@@ -80,7 +122,16 @@ const Index: React.FC = () => {
               </p>
             </div>
             
-            <div className="elegant-card text-center">
+            {/* Step 3 */}
+            <div 
+              ref={step3Reveal.ref}
+              className={`elegant-card text-center transition-all duration-500 ease-out ${
+                step3Reveal.isVisible 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-6'
+              }`}
+              style={{ transitionDelay: '300ms' }}
+            >
               <div className="w-16 h-16 bg-blush-100 dark:bg-blush-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="font-script text-2xl text-blush-500 dark:text-blush-400">3</span>
               </div>
