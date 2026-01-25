@@ -194,7 +194,10 @@ const VenueCard: React.FC<VenueCardProps> = ({ venue }) => {
         {/* Dual CTAs - Primary Book + Secondary Contact */}
         <div className="flex flex-col gap-2">
           <Link to={`/venues/${venue.id}`} className="w-full">
-            <Button className="w-full bg-blush-500 hover:bg-blush-600 text-white min-h-[44px]">
+            <Button 
+              className="w-full bg-blush-500 hover:bg-blush-600 text-white min-h-[44px]"
+              pulse
+            >
               {t('venues.bookThisVenue', 'Book This Venue')}
             </Button>
           </Link>
