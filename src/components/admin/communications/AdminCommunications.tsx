@@ -180,7 +180,7 @@ const AdminCommunications: React.FC = () => {
 
       const { error } = await supabase
         .from('support_tickets')
-        .update(updateData)
+        .update(updateData as never)
         .eq('id', id);
       if (error) throw error;
     },
