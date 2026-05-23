@@ -69,7 +69,7 @@ export const useUpdateHomepageSection = () => {
     mutationFn: async ({ id, ...updates }: Partial<HomepageSection> & { id: string }) => {
       const { data, error } = await supabase
         .from('homepage_sections')
-        .update(updates as unknown as Record<string, unknown>)
+        .update(updates as never)
         .eq('id', id)
         .select()
         .single();
