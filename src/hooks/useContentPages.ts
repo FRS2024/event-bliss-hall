@@ -58,7 +58,7 @@ export const useUpdateContentPage = () => {
     mutationFn: async ({ id, ...updates }: Partial<ContentPage> & { id: string }) => {
       const { data, error } = await supabase
         .from('content_pages')
-        .update(updates as unknown as Record<string, unknown>)
+        .update(updates as never)
         .eq('id', id)
         .select()
         .single();
